@@ -29,6 +29,8 @@ import EmployerSignUp from "./components/employer-signup";
 import EmployerDashboard from "./components/employer-dashboard";
 import ExternalApplications from "./components/external-applications";
 import UploadCandidates from "./components/upload-candidates";
+import JobPostings from "./components/Jobs/JobListings";
+import CandidateManagement from "./components/candidate/candidate-management";
 
 // 🔹 Floating Route Dialog Component
 const RouteDialog = () => {
@@ -53,6 +55,7 @@ const RouteDialog = () => {
     { path: "/employer-dashboard", label: "Employer Dashboard" },
     { path: "/external-applications", label: "External Applications" },
     { path: "/upload-candidates", label: "Upload Candidates" },
+    { path: "/jobs-hub", label: "Job Hub" },
   ];
 
   if (!visible) {
@@ -158,6 +161,8 @@ function App() {
           <Route path="/employer-dashboard" element={<EmployerDashboard />} />
           <Route path="/external-applications" element={<ExternalApplications />} />
           <Route path="/upload-candidates" element={<UploadCandidates />} />
+          <Route path="/jobs-hub" element={<JobPostings />} />
+          <Route path="/candidate-management" element={<CandidateManagement />} />
         </Routes>
       </div>
     </Router>

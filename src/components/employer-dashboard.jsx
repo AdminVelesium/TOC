@@ -39,6 +39,14 @@ const EmployerDashboard = () => {
 
     const navigate = useNavigate();
 
+    const handleJobposts = () => {
+        navigate('/jobs-hub')
+    }
+
+    const handleCandidate = () => {
+        navigate('/candidate-management')
+    }
+
     // Sample data for charts and tables
     const pipelineData = [
         { stage: "New Applications", count: 450, color: "#6366f1" },
@@ -337,23 +345,17 @@ const EmployerDashboard = () => {
                         >
                             Dashboard
                         </Menu.Item>
-                        <Menu.Item key="job-posts" icon={<FileTextOutlined />}>
+                        <Menu.Item onClick={handleJobposts} key="job-posts" icon={<FileTextOutlined />}>
                             Job Posts
                         </Menu.Item>
                         <Menu.Item key="applicants" icon={<UserOutlined />}>
                             Applicants
                         </Menu.Item>
-                        <Menu.Item key="candidates-other" icon={<TeamOutlined />}>
-                            Candidates from other emp
-                        </Menu.Item>
                         <Menu.Item key="settings" icon={<SettingOutlined />}>
                             Settings
                         </Menu.Item>
-                        <Menu.Item key="candidate-management" icon={<TeamOutlined />}>
+                        <Menu.Item onClick={handleCandidate} key="candidate-management" icon={<TeamOutlined />}>
                             Candidate Management
-                        </Menu.Item>
-                        <Menu.Item key="external-candidates" icon={<UserOutlined />}>
-                            External Candidates
                         </Menu.Item>
                     </Menu>
                 </Sider>
