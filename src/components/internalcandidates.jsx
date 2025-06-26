@@ -784,33 +784,7 @@ const InternalCandidates = () => {
                     </div>
 
                     {/* Footer */}
-                    <div
-                        style={{
-                            textAlign: "center",
-                            marginTop: "clamp(32px, 4vw, 40px)",
-                            padding: "clamp(16px, 2vw, 20px)",
-                            color: "#999",
-                            fontSize: "clamp(12px, 1vw, 13px)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: "clamp(6px, 0.8vw, 8px)",
-                        }}
-                    >
-                        <span>Made with</span>
-                        <div
-                            style={{
-                                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                color: "#fff",
-                                padding: "2px 6px",
-                                borderRadius: "4px",
-                                fontSize: "clamp(10px, 0.9vw, 12px)",
-                                fontWeight: "600",
-                            }}
-                        >
-                            Visily
-                        </div>
-                    </div>
+
                 </Content>
             </Layout>
         </Layout>

@@ -625,18 +625,7 @@ const EmployerProfileSetup1 = ({ onNavigate, formData, setFormData }) => {
           </div>
 
           {/* Footer */}
-          <div
-            style={{
-              textAlign: "left",
-              marginTop: "clamp(40px, 5vw, 60px)",
-              padding: "clamp(16px, 2vw, 20px) 0",
-              color: "#999",
-              fontSize: "clamp(12px, 1vw, 14px)",
-              borderTop: "1px solid #f0f0f0",
-            }}
-          >
-            Made with <span style={{ color: "#1890ff", fontWeight: "bold" }}>Visily</span>
-          </div>
+
         </div>
       </Content>
     </div>

@@ -426,17 +426,7 @@ export default function WorkExperience({ onNext, onPrevious }) {
       </div>
 
       {/* Footer */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          left: "20px",
-          fontSize: "12px",
-          color: "#9ca3af",
-        }}
-      >
-        Made with <span style={{ color: "#3b82f6" }}>Visily</span>
-      </div>
+
     </div>
   )
 }

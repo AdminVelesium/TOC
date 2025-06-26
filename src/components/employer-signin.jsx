@@ -284,33 +284,7 @@ const EmployerSignIn = () => {
             </div>
 
             {/* Footer */}
-            <div
-                style={{
-                    position: "absolute",
-                    bottom: "clamp(16px, 2vw, 24px)",
-                    left: "clamp(16px, 2vw, 24px)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "clamp(6px, 0.8vw, 8px)",
-                    color: "#999",
-                    fontSize: "clamp(12px, 1vw, 13px)",
-                    zIndex: 10,
-                }}
-            >
-                <span>Made with</span>
-                <div
-                    style={{
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        color: "#fff",
-                        padding: "2px 6px",
-                        borderRadius: "4px",
-                        fontSize: "clamp(10px, 0.9vw, 12px)",
-                        fontWeight: "600",
-                    }}
-                >
-                    Visily
-                </div>
-            </div>
+
         </div>
     )
 }

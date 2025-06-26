@@ -561,19 +561,7 @@ const UploadCandidates = () => {
                 </div>
 
                 {/* Footer */}
-                <div
-                    style={{
-                        textAlign: "center",
-                        padding: "clamp(16px, 3vw, 24px)",
-                        color: "#8c8c8c",
-                        fontSize: "clamp(12px, 2vw, 14px)",
-                        borderTop: "1px solid #f0f0f0",
-                        background: "#fff",
-                        borderRadius: "8px",
-                    }}
-                >
-                    Made with <span style={{ color: "#1890ff", fontWeight: "bold" }}>Visily</span>
-                </div>
+
             </Content>
         </Layout>
     )

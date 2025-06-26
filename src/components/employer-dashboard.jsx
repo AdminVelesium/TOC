@@ -819,19 +819,6 @@ const EmployerDashboard = () => {
                         </Card>
 
                         {/* Footer */}
-                        <div
-                            style={{
-                                textAlign: "center",
-                                padding: "clamp(16px, 3vw, 24px)",
-                                color: "#8c8c8c",
-                                fontSize: "clamp(11px, 2vw, 12px)",
-                                borderTop: "1px solid #f0f0f0",
-                                background: "#fff",
-                                borderRadius: "8px",
-                            }}
-                        >
-                            Made with <span style={{ color: "#6366f1", fontWeight: "bold" }}>Visily</span>
-                        </div>
                     </Content>
                 </Layout>
             </Layout>
