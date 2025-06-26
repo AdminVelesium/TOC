@@ -144,7 +144,6 @@ export default function Homepage() {
                             minWidth: 0,
                         }}
                     >
-                        <div></div>
                         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
                             <span
                                 style={{
