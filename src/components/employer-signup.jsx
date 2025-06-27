@@ -17,7 +17,7 @@ const EmployerSignUp = () => {
     }
 
     const handleSignup = () => {
-        navigate("/employer-profile-setup")
+        navigate("/employer-profile-setup-1")
     }
 
     const containerStyle = {

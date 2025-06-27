@@ -8,17 +8,11 @@ import {
 } from "react-router-dom";
 
 import Homepage from "./components/Homepage/Homepage";
-import PersonalDetails from "./components/ProfileSetups/1personal-details";
-import Education from "./components/ProfileSetups/2education";
-import WorkExperience from "./components/ProfileSetups/3work-experience";
-import Skills from "./components/ProfileSetups/4skills";
-import Projects from "./components/ProfileSetups/5projects";
-import Setup from "./components/ProfileSetups/setup";
+import CandidateProfileSetup from "./components/ProfileSetups/CandidateProfileSetup"
 import Signup from "./components/Loginandsignup/Signup";
 import Signin from "./components/Loginandsignup/Login";
 import CandidateProfile from "./components/candidate/candidate-profile";
 import CompanyProfile from "./components/company-profile";
-import EmployerProfileSetup1 from "./components/company-profile-setup";
 import EmployerProfileSetup2 from "./components/company-profile-setup-2";
 import JobPostingForm from "./components/Jobs/Jobposting";
 import OtherCompaniesCandidates from "./components/other-companies-candidates";
@@ -31,6 +25,7 @@ import ExternalApplications from "./components/external-applications";
 import UploadCandidates from "./components/upload-candidates";
 import JobPostings from "./components/Jobs/JobListings";
 import CandidateManagement from "./components/candidate/candidate-management";
+import AllJobs from "./components/AllJobs"
 
 // 🔹 Floating Route Dialog Component
 const RouteDialog = () => {
@@ -44,7 +39,6 @@ const RouteDialog = () => {
     { path: "/candidate/profile", label: "Candidate Profile" },
     { path: "/profile-setup", label: "Profile Setup" },
     { path: "/company-profile", label: "Company Profile" },
-    { path: "/employer-profile-setup", label: "Employer Profile Setup" },
     { path: "/employer-profile-setup-1", label: "Employer Profile Setup 1" },
     { path: "/jobposting", label: "Job Posting" },
     { path: "/other-companies-candidates", label: "Other Companies' Candidates" },
@@ -56,6 +50,8 @@ const RouteDialog = () => {
     { path: "/external-applications", label: "External Applications" },
     { path: "/upload-candidates", label: "Upload Candidates" },
     { path: "/jobs-hub", label: "Job Hub" },
+    { path: "/candidate-management", label: "Candidate Management" },
+    { path: "/all-jobs", label: "All Jobs" },
   ];
 
   if (!visible) {
@@ -80,7 +76,6 @@ const RouteDialog = () => {
       </button>
     );
   }
-
   return (
     <div
       style={{
@@ -134,15 +129,13 @@ function App() {
       <div className="App">
         {/* 🔹 Floating Route Navigation Dialog */}
         <RouteDialog />
-
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/jobs" element={<JobPostingForm />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/candidate/profile" element={<CandidateProfile />} />
-          <Route path="/profile-setup" element={<Setup />} />
-          <Route path="/profile-setup/:step" element={<Setup />} />
+          <Route path="/profile-setup" element={<CandidateProfileSetup />} />
           <Route path="/personal-details" element={<Navigate to="/profile-setup" replace />} />
           <Route path="/education" element={<Navigate to="/profile-setup" replace />} />
           <Route path="/work-experience" element={<Navigate to="/profile-setup" replace />} />
@@ -150,7 +143,6 @@ function App() {
           <Route path="/projects" element={<Navigate to="/profile-setup" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
           <Route path="/company-profile" element={<CompanyProfile />} />
-          <Route path="/employer-profile-setup" element={<EmployerProfileSetup1 />} />
           <Route path="/employer-profile-setup-1" element={<EmployerProfileSetup2 />} />
           <Route path="/jobposting" element={<JobPostingForm />} />
           <Route path="/other-companies-candidates" element={<OtherCompaniesCandidates />} />
@@ -163,10 +155,10 @@ function App() {
           <Route path="/upload-candidates" element={<UploadCandidates />} />
           <Route path="/jobs-hub" element={<JobPostings />} />
           <Route path="/candidate-management" element={<CandidateManagement />} />
+          <Route path="/all-jobs" element={<AllJobs />} />
         </Routes>
       </div>
     </Router>
   );
 }
-
 export default App;

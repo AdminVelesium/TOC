@@ -12,7 +12,7 @@ const SignUp = () => {
         <div style={{
             fontFamily: 'sans-serif',
             height: '100vh',
-            backgroundColor: '#ef7fa4',
+            backgroundColor: '#333',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',

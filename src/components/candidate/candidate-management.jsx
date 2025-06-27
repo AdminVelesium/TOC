@@ -506,7 +506,6 @@ const CandidateManagement = () => {
                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
                 }}>
                     <div>
-                        <Text strong style={{ fontSize: 16 }}>Candidate Management</Text>
                         <Text type="secondary" style={{ marginLeft: 16 }}>
                             {activeTab === 'internal' ? 'Internal Candidates' :
                                 activeTab === 'external' ? 'External Candidates' :

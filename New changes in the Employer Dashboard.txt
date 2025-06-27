@@ -1,0 +1,15 @@
+-Employer dashboard changes
+	|- Job posts sidebar section works and redirects to '/jobs-hub'.
+	|	- Created "Candidate Management" section page which holds below pages
+	|		- Internal Candidates
+	|		- External Candidates
+	|		- Other Companies Candidates
+	|
+	|
+	|
+	|--> A page which holds all the jobs posted by the current Employer and External Job listings 
+		- Our Job Postings
+		- External Job Lisitngs
+		- Applications
+		- Settings
+		- View Profile

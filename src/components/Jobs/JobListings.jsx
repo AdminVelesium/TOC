@@ -1667,7 +1667,6 @@ const Settings = () => {
                     </Row>
                 </Card>
             )}
-
             {activeTab === 'security' && (
                 <Card title="Security Settings" style={{ borderRadius: 8, marginBottom: 24 }}>
                     <Row gutter={24}>
@@ -1676,7 +1675,6 @@ const Settings = () => {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div>
                                         <Text strong>Password</Text>
-                                        <div><Text type="secondary">Last changed 3 months ago</Text></div>
                                     </div>
                                     <Button>Change Password</Button>
                                 </div>
@@ -1725,7 +1723,6 @@ const Settings = () => {
                                         <Button icon={<CloudDownloadOutlined />}>Export</Button>
                                     </div>
                                 </div>
-
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div>
                                         <Text strong>Delete Account</Text>
@@ -1741,7 +1738,6 @@ const Settings = () => {
         </div>
     );
 };
-
 export default function JobDashboard() {
     const [activeMenu, setActiveMenu] = useState("1");
 

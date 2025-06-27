@@ -1,722 +1,2213 @@
 "use client"
 
-import { useState } from "react"
-import { Layout, Input, Button, Typography, Row, Col, Select, Avatar, Space } from "antd"
-import {
-    SearchOutlined,
-    BellOutlined,
-    UserOutlined,
-    PlusOutlined,
-    FilterOutlined,
-    ShareAltOutlined,
-    MoreOutlined,
-    EyeOutlined,
-} from "@ant-design/icons"
+import { useState, useEffect } from "react"
+import { Menu, X, Search, Filter, Plus, Bell, Users, Settings, LogOut, Eye, Mail, MapPin, Briefcase, Star, MoreVertical, ChevronDown, Grid, List, Download, Share2, Heart, GraduationCap, Clock, Bookmark, MessageCircle, Calendar, Award } from 'lucide-react'
 
-const { Header, Sider, Content } = Layout
-const { Title, Text } = Typography
-const { Option } = Select
+export default function ExternalCandidates() {
+    const [isMobile, setIsMobile] = useState(false)
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [viewMode, setViewMode] = useState("grid")
+    const [selectedCandidates, setSelectedCandidates] = useState([])
+    const [searchQuery, setSearchQuery] = useState("")
+    const [activeFilter, setActiveFilter] = useState("all")
 
-const ExternalCandidates = () => {
-    const [selectedFilters, setSelectedFilters] = useState({
-        skills: "Skills",
-        experience: "Experience",
-        availability: "Availability",
-    })
+    // Handle responsive behavior
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768)
+            if (window.innerWidth >= 768) {
+                setIsMenuOpen(false)
+            }
+        }
 
-    const containerStyle = {
-        minHeight: "100vh",
-        background: "#f8fafc",
-        width: "100vw",
-        maxWidth: "100%",
-        overflow: "hidden",
-        boxSizing: "border-box",
-    }
+        handleResize()
+        window.addEventListener("resize", handleResize)
+        return () => window.removeEventListener("resize", handleResize)
+    }, [])
 
-    const headerStyle = {
-        background: "#fff",
-        padding: "0 clamp(16px, 2vw, 24px)",
-        borderBottom: "1px solid #f0f0f0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        height: "clamp(56px, 7vw, 64px)",
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        width: "100%",
-    }
-
-    const logoStyle = {
-        display: "flex",
-        alignItems: "center",
-        gap: "clamp(8px, 1vw, 12px)",
-        fontSize: "clamp(16px, 1.4vw, 18px)",
-        fontWeight: "600",
-        color: "#1a1a1a",
-    }
-
-    const logoIconStyle = {
-        width: "clamp(24px, 2.5vw, 28px)",
-        height: "clamp(24px, 2.5vw, 28px)",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        borderRadius: "6px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#fff",
-        fontSize: "clamp(12px, 1.2vw, 14px)",
-        fontWeight: "bold",
-    }
-
-    const navStyle = {
-        display: "flex",
-        gap: "clamp(24px, 3vw, 32px)",
-        alignItems: "center",
-    }
-
-    const navItemStyle = {
-        fontSize: "clamp(14px, 1.2vw, 15px)",
-        color: "#666",
-        cursor: "pointer",
-        padding: "clamp(8px, 1vw, 10px) 0",
-        borderBottom: "2px solid transparent",
-        transition: "all 0.3s ease",
-    }
-
-    const activeNavItemStyle = {
-        ...navItemStyle,
-        color: "#667eea",
-        borderBottomColor: "#667eea",
-        fontWeight: "500",
-    }
-
-    const headerActionsStyle = {
-        display: "flex",
-        alignItems: "center",
-        gap: "clamp(12px, 1.5vw, 16px)",
-    }
-
-    const siderStyle = {
-        background: "#fff",
-        borderRight: "1px solid #f0f0f0",
-        width: "clamp(200px, 15vw, 240px)",
-        minHeight: "100vh",
-        position: "fixed",
-        left: 0,
-        top: "clamp(56px, 7vw, 64px)",
-        zIndex: 50,
-        overflow: "auto",
-    }
-
-    const siderMenuStyle = {
-        padding: "clamp(16px, 2vw, 20px) 0",
-    }
-
-    const menuItemStyle = {
-        padding: "clamp(10px, 1.2vw, 12px) clamp(16px, 2vw, 20px)",
-        display: "flex",
-        alignItems: "center",
-        gap: "clamp(8px, 1vw, 12px)",
-        fontSize: "clamp(13px, 1.1vw, 14px)",
-        color: "#666",
-        cursor: "pointer",
-        transition: "all 0.3s ease",
-        borderRadius: "0 20px 20px 0",
-        margin: "0 clamp(8px, 1vw, 12px) clamp(4px, 0.5vw, 6px) 0",
-    }
-
-    const activeMenuItemStyle = {
-        ...menuItemStyle,
-        background: "#667eea",
-        color: "#fff",
-        fontWeight: "500",
-    }
-
-    const contentStyle = {
-        marginLeft: "clamp(200px, 15vw, 240px)",
-        marginTop: "clamp(56px, 7vw, 64px)",
-        padding: "clamp(20px, 2.5vw, 24px)",
-        minHeight: "calc(100vh - clamp(56px, 7vw, 64px))",
-        background: "#f8fafc",
-    }
-
-    const titleSectionStyle = {
-        marginBottom: "clamp(24px, 3vw, 32px)",
-    }
-
-    const statsRowStyle = {
-        marginBottom: "clamp(24px, 3vw, 32px)",
-    }
-
-    const statCardStyle = {
-        background: "#fff",
-        borderRadius: "clamp(8px, 1vw, 12px)",
-        padding: "clamp(16px, 2vw, 20px)",
-        border: "1px solid #f0f0f0",
-        textAlign: "center",
-        height: "100%",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-    }
-
-    const statNumberStyle = {
-        fontSize: "clamp(24px, 3vw, 32px)",
-        fontWeight: "700",
-        color: "#1a1a1a",
-        marginBottom: "clamp(4px, 0.5vw, 6px)",
-        display: "block",
-    }
-
-    const statLabelStyle = {
-        fontSize: "clamp(12px, 1vw, 13px)",
-        color: "#666",
-        fontWeight: "500",
-    }
-
-    const statDescStyle = {
-        fontSize: "clamp(11px, 0.9vw, 12px)",
-        color: "#999",
-        marginTop: "clamp(4px, 0.5vw, 6px)",
-    }
-
-    const filterSectionStyle = {
-        background: "#fff",
-        borderRadius: "clamp(8px, 1vw, 12px)",
-        padding: "clamp(16px, 2vw, 20px)",
-        marginBottom: "clamp(20px, 2.5vw, 24px)",
-        border: "1px solid #f0f0f0",
-        display: "flex",
-        alignItems: "center",
-        gap: "clamp(12px, 1.5vw, 16px)",
-        flexWrap: "wrap",
-    }
-
-    const candidateCardStyle = {
-        background: "#fff",
-        borderRadius: "clamp(8px, 1vw, 12px)",
-        padding: "clamp(16px, 2vw, 20px)",
-        border: "1px solid #f0f0f0",
-        height: "100%",
-        transition: "all 0.3s ease",
-        cursor: "pointer",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-    }
-
-    const candidateHeaderStyle = {
-        display: "flex",
-        alignItems: "center",
-        gap: "clamp(12px, 1.5vw, 16px)",
-        marginBottom: "clamp(12px, 1.5vw, 16px)",
-    }
-
-    const candidateInfoStyle = {
-        flex: 1,
-    }
-
-    const candidateNameStyle = {
-        fontSize: "clamp(15px, 1.3vw, 16px)",
-        fontWeight: "600",
-        color: "#1a1a1a",
-        marginBottom: "clamp(2px, 0.3vw, 4px)",
-    }
-
-    const candidateTitleStyle = {
-        fontSize: "clamp(13px, 1.1vw, 14px)",
-        color: "#666",
-        marginBottom: "clamp(4px, 0.5vw, 6px)",
-    }
-
-    const candidateMetaStyle = {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "clamp(8px, 1vw, 12px)",
-        marginBottom: "clamp(12px, 1.5vw, 16px)",
-        fontSize: "clamp(12px, 1vw, 13px)",
-    }
-
-    const skillsStyle = {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "clamp(4px, 0.5vw, 6px)",
-        marginBottom: "clamp(12px, 1.5vw, 16px)",
-    }
-
-    const skillTagStyle = {
-        fontSize: "clamp(11px, 0.9vw, 12px)",
-        padding: "2px 8px",
-        borderRadius: "12px",
-        background: "#f0f4ff",
-        color: "#667eea",
-        border: "1px solid #e6f0ff",
-    }
-
-    const cardActionsStyle = {
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingTop: "clamp(8px, 1vw, 12px)",
-        borderTop: "1px solid #f0f0f0",
-    }
-
-    const candidates = [
+    // Sample external candidates data (freshers and job seekers)
+    const externalCandidates = [
         {
-            id: 1,
-            name: "Olivia Chen",
-            title: "Senior Software Engineer at Innovative Solutions",
-            experience: "7 years",
+            id: "1",
+            name: "Priya Sharma",
+            email: "priya.sharma@gmail.com",
+            phone: "+91 98765 43210",
+            appliedFor: "Software Developer Trainee",
+            education: "B.Tech Computer Science",
+            college: "IIT Delhi",
+            graduationYear: "2024",
+            cgpa: "8.5",
+            skills: ["Java", "Python", "React", "SQL", "Git", "HTML/CSS"],
+            experience: "Fresher",
+            location: "Delhi, India",
             availability: "Immediately Available",
-            availabilityColor: "green",
-            skills: ["React", "Node.js", "AWS", "PostgreSQL"],
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+            availabilityColor: "#10b981",
+            expectedSalary: "₹4-6 LPA",
+            internships: 2,
+            projects: 5,
+            avatar: "/placeholder.svg?height=150&width=150",
+            appliedDate: "2 days ago",
+            status: "Under Review",
+            statusColor: "#f59e0b",
+            certifications: ["Oracle Java Certified", "AWS Cloud Practitioner"],
+            portfolioUrl: "#",
+            githubUrl: "#",
+            linkedinUrl: "#",
+            isBookmarked: false,
+            matchScore: 92,
+            resumeUrl: "#",
         },
         {
-            id: 2,
-            name: "Marcus Thorne",
-            title: "Product Manager at Synergy Corp",
-            experience: "5 years",
-            availability: "2 Weeks Notice",
-            availabilityColor: "orange",
-            skills: ["Agile", "Market Research", "Roadmapping", "SaaS"],
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-        },
-        {
-            id: 3,
-            name: "Sophia Rodriguez",
-            title: "UX/UI Designer at Design Studio",
-            experience: "4 years",
+            id: "2",
+            name: "Rahul Kumar",
+            email: "rahul.kumar@gmail.com",
+            phone: "+91 87654 32109",
+            appliedFor: "Data Analyst",
+            education: "B.Sc Statistics",
+            college: "Delhi University",
+            graduationYear: "2023",
+            cgpa: "7.8",
+            skills: ["Python", "R", "SQL", "Excel", "Tableau", "Power BI"],
+            experience: "6 months internship",
+            location: "Mumbai, India",
             availability: "Immediately Available",
-            availabilityColor: "green",
-            skills: ["Figma", "Sketch", "User Research", "Prototyping"],
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+            availabilityColor: "#10b981",
+            expectedSalary: "₹3.5-5 LPA",
+            internships: 1,
+            projects: 3,
+            avatar: "/placeholder.svg?height=150&width=150",
+            appliedDate: "1 day ago",
+            status: "Shortlisted",
+            statusColor: "#10b981",
+            certifications: ["Google Data Analytics", "Microsoft Excel Expert"],
+            portfolioUrl: "#",
+            githubUrl: "#",
+            linkedinUrl: "#",
+            isBookmarked: true,
+            matchScore: 88,
+            resumeUrl: "#",
         },
         {
-            id: 4,
-            name: "David Kim",
-            title: "Data Scientist at Quantify Analytics",
-            experience: "6 years",
-            availability: "Negotiable",
-            availabilityColor: "blue",
-            skills: ["Python", "R", "Machine Learning", "Big Data"],
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+            id: "3",
+            name: "Sneha Patel",
+            email: "sneha.patel@gmail.com",
+            phone: "+91 76543 21098",
+            appliedFor: "UI/UX Designer",
+            education: "B.Des Visual Communication",
+            college: "NIFT Mumbai",
+            graduationYear: "2024",
+            cgpa: "8.2",
+            skills: ["Figma", "Adobe XD", "Photoshop", "Illustrator", "Sketch", "Prototyping"],
+            experience: "Fresher",
+            location: "Bangalore, India",
+            availability: "Available in 1 month",
+            availabilityColor: "#f59e0b",
+            expectedSalary: "₹3-4.5 LPA",
+            internships: 3,
+            projects: 8,
+            avatar: "/placeholder.svg?height=150&width=150",
+            appliedDate: "3 days ago",
+            status: "Interview Scheduled",
+            statusColor: "#3b82f6",
+            certifications: ["Google UX Design", "Adobe Certified Expert"],
+            portfolioUrl: "#",
+            githubUrl: "#",
+            linkedinUrl: "#",
+            isBookmarked: false,
+            matchScore: 95,
+            resumeUrl: "#",
         },
         {
-            id: 5,
-            name: "Elena Petrova",
-            title: "Marketing Director at BrandBoost Agency",
-            experience: "8 years",
+            id: "4",
+            name: "Arjun Singh",
+            email: "arjun.singh@gmail.com",
+            phone: "+91 65432 10987",
+            appliedFor: "Digital Marketing Executive",
+            education: "MBA Marketing",
+            college: "Symbiosis Pune",
+            graduationYear: "2024",
+            cgpa: "8.0",
+            skills: ["SEO", "Google Ads", "Social Media", "Content Writing", "Analytics", "Email Marketing"],
+            experience: "1 year internship",
+            location: "Pune, India",
             availability: "Immediately Available",
-            availabilityColor: "green",
-            skills: ["SEO", "Content Marketing", "Social Media", "Analytics"],
-            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+            availabilityColor: "#10b981",
+            expectedSalary: "₹4-6 LPA",
+            internships: 2,
+            projects: 4,
+            avatar: "/placeholder.svg?height=150&width=150",
+            appliedDate: "5 days ago",
+            status: "Under Review",
+            statusColor: "#f59e0b",
+            certifications: ["Google Ads Certified", "HubSpot Content Marketing"],
+            portfolioUrl: "#",
+            githubUrl: "#",
+            linkedinUrl: "#",
+            isBookmarked: true,
+            matchScore: 85,
+            resumeUrl: "#",
         },
         {
-            id: 6,
-            name: "Daniel Lee",
-            title: "DevOps Engineer at CloudBridge Solutions",
-            experience: "5 years",
-            availability: "2 Weeks Notice",
-            availabilityColor: "orange",
-            skills: ["Kubernetes", "Docker", "CI/CD", "Azure"],
-            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
-        },
-        {
-            id: 7,
-            name: "Jessica Wong",
-            title: "Customer Success Manager at ClientCare Inc.",
-            experience: "5 years",
+            id: "5",
+            name: "Kavya Reddy",
+            email: "kavya.reddy@gmail.com",
+            phone: "+91 54321 09876",
+            appliedFor: "Business Analyst Trainee",
+            education: "B.Com with Computer Applications",
+            college: "Christ University Bangalore",
+            graduationYear: "2023",
+            cgpa: "8.7",
+            skills: ["SQL", "Excel", "Power BI", "Business Analysis", "Process Mapping", "Documentation"],
+            experience: "Fresher",
+            location: "Hyderabad, India",
             availability: "Immediately Available",
-            availabilityColor: "green",
-            skills: ["CRM", "Client Relations", "Onboarding", "SaaS"],
-            avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
+            availabilityColor: "#10b981",
+            expectedSalary: "₹3.5-5 LPA",
+            internships: 1,
+            projects: 2,
+            avatar: "/placeholder.svg?height=150&width=150",
+            appliedDate: "1 week ago",
+            status: "Rejected",
+            statusColor: "#ef4444",
+            certifications: ["Microsoft Excel Expert", "CBAP Foundation"],
+            portfolioUrl: "#",
+            githubUrl: "#",
+            linkedinUrl: "#",
+            isBookmarked: false,
+            matchScore: 78,
+            resumeUrl: "#",
         },
         {
-            id: 8,
-            name: "Arthur Miller",
-            title: "Senior Quality Assurance Engineer at Precision Testing Labs",
-            experience: "7 years",
-            availability: "Negotiable",
-            availabilityColor: "blue",
-            skills: ["Automated Testing", "Manual Testing", "Jira", "TestRail"],
-            avatar: "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=150&h=150&fit=crop&crop=face",
-        },
-        {
-            id: 9,
-            name: "Chloe Dubois",
-            title: "Financial Analyst at Global Finance Partners",
-            experience: "4 years",
-            availability: "2 Weeks Notice",
-            availabilityColor: "orange",
-            skills: ["Financial Modeling", "Data Analysis", "Excel", "SAP"],
-            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
-        },
-        {
-            id: 10,
-            name: "Ben Carter",
-            title: "Sales Executive at GrowthForge Solutions",
-            experience: "6 years",
-            availability: "Immediately Available",
-            availabilityColor: "green",
-            skills: ["B2B Sales", "Lead Generation", "Negotiation", "CRM"],
-            avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+            id: "6",
+            name: "Vikash Gupta",
+            email: "vikash.gupta@gmail.com",
+            phone: "+91 43210 98765",
+            appliedFor: "Quality Assurance Trainee",
+            education: "B.Tech Information Technology",
+            college: "VIT Vellore",
+            graduationYear: "2024",
+            cgpa: "7.9",
+            skills: ["Manual Testing", "Selenium", "Java", "API Testing", "Bug Tracking", "Test Cases"],
+            experience: "6 months internship",
+            location: "Chennai, India",
+            availability: "Available in 2 weeks",
+            availabilityColor: "#f59e0b",
+            expectedSalary: "₹3-4.5 LPA",
+            internships: 1,
+            projects: 3,
+            avatar: "/placeholder.svg?height=150&width=150",
+            appliedDate: "4 days ago",
+            status: "Under Review",
+            statusColor: "#f59e0b",
+            certifications: ["ISTQB Foundation", "Selenium WebDriver"],
+            portfolioUrl: "#",
+            githubUrl: "#",
+            linkedinUrl: "#",
+            isBookmarked: false,
+            matchScore: 82,
+            resumeUrl: "#",
         },
     ]
 
-    const getAvailabilityColor = (color) => {
-        const colors = {
-            green: "#52c41a",
-            orange: "#fa8c16",
-            blue: "#1890ff",
-        }
-        return colors[color] || "#666"
+    const navigationItems = [
+        { id: "dashboard", name: "Dashboard", icon: <Users size={20} />, active: false },
+        { id: "external", name: "External Candidates", icon: <GraduationCap size={20} />, active: true },
+        { id: "applications", name: "Job Applications", icon: <Briefcase size={20} /> },
+        { id: "interviews", name: "Interview Schedule", icon: <Calendar size={20} /> },
+    ]
+
+    const statusFilters = [
+        { id: "all", name: "All Applications", count: externalCandidates.length },
+        { id: "review", name: "Under Review", count: 3 },
+        { id: "shortlisted", name: "Shortlisted", count: 1 },
+        { id: "interview", name: "Interview Scheduled", count: 1 },
+        { id: "rejected", name: "Rejected", count: 1 },
+    ]
+
+    const filteredCandidates = externalCandidates.filter((candidate) => {
+        const matchesSearch =
+            candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            candidate.appliedFor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            candidate.education.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            candidate.college.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            candidate.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase()))
+
+        const matchesFilter =
+            activeFilter === "all" ||
+            (activeFilter === "review" && candidate.status === "Under Review") ||
+            (activeFilter === "shortlisted" && candidate.status === "Shortlisted") ||
+            (activeFilter === "interview" && candidate.status === "Interview Scheduled") ||
+            (activeFilter === "rejected" && candidate.status === "Rejected")
+
+        return matchesSearch && matchesFilter
+    })
+
+    const handleCandidateSelect = (candidateId) => {
+        setSelectedCandidates((prev) =>
+            prev.includes(candidateId) ? prev.filter((id) => id !== candidateId) : [...prev, candidateId],
+        )
+    }
+
+    const toggleBookmark = (candidateId) => {
+        // In a real app, this would update the backend
+        console.log("Toggle bookmark for candidate:", candidateId)
     }
 
     return (
-        <Layout style={containerStyle}>
+        <div
+            style={{
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                lineHeight: "1.6",
+                color: "#1f2937",
+                margin: 0,
+                padding: 0,
+                backgroundColor: "#f8fafc",
+                minHeight: "100vh",
+                zoom: 0.9
+            }}
+        >
             {/* Header */}
-            <Header style={headerStyle}>
-                {/* Logo Section from Homepage.jsx */}
+            <header
+                style={{
+                    backgroundColor: "#ffffff",
+                    borderBottom: "1px solid #e5e7eb",
+                    position: "sticky",
+                    top: 0,
+                    zIndex: 1000,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                }}
+            >
                 <div
                     style={{
+                        maxWidth: "1400px",
+                        margin: "0 auto",
+                        padding: "0 1rem",
                         display: "flex",
+                        justifyContent: "space-between",
                         alignItems: "center",
-                        gap: "0.5rem",
-                        minWidth: 0,
+                        height: "70px",
                     }}
                 >
-                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-                        <span
+                    {/* Logo */}
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            cursor: "pointer",
+                        }}
+                    >
+                        <div
                             style={{
-                                fontSize: "1.65rem",
-                                fontWeight: "600",
+                                width: "32px",
+                                height: "32px",
+                                background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                                borderRadius: "8px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "white",
+                                fontSize: "0.9rem",
+                                fontWeight: "700",
+                            }}
+                        >
+                            <Heart size={16} />
+                        </div>
+                        <div
+                            style={{
+                                fontSize: isMobile ? "1.25rem" : "1.5rem",
+                                fontWeight: "700",
                                 color: "#1f2937",
-                                lineHeight: "1.1",
-                                whiteSpace: "nowrap",
-                                marginLeft: "-8vw",
-                                marginTop: "-4vh",
+                            }}
+                        >
+                            Talent on <span style={{ color: "#6366f1" }}>Cloud</span>
+                        </div>
+                    </div>
+
+                    {/* Desktop Navigation */}
+                    {!isMobile && (
+                        <nav
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "2rem",
+                            }}
+                        >
+                            <a
+                                href="#"
+                                style={{
+                                    textDecoration: "none",
+                                    color: "#4b5563",
+                                    fontSize: "0.95rem",
+                                    fontWeight: "500",
+                                    padding: "0.5rem 0",
+                                    transition: "color 0.2s ease",
+                                }}
+                                onMouseEnter={(e) => (e.target.style.color = "#6366f1")}
+                                onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                            >
+                                Dashboard
+                            </a>
+                            <a
+                                href="#"
+                                style={{
+                                    textDecoration: "none",
+                                    color: "#6366f1",
+                                    fontSize: "0.95rem",
+                                    fontWeight: "600",
+                                    padding: "0.5rem 0",
+                                    borderBottom: "2px solid #6366f1",
+                                }}
+                            >
+                                External Candidates
+                            </a>
+                            <a
+                                href="#"
+                                style={{
+                                    textDecoration: "none",
+                                    color: "#4b5563",
+                                    fontSize: "0.95rem",
+                                    fontWeight: "500",
+                                    padding: "0.5rem 0",
+                                    transition: "color 0.2s ease",
+                                }}
+                                onMouseEnter={(e) => (e.target.style.color = "#6366f1")}
+                                onMouseLeave={(e) => (e.target.style.color = "#4b5563")}
+                            >
+                                Applications
+                            </a>
+                        </nav>
+                    )}
+
+                    {/* Right Side Actions */}
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: isMobile ? "0.5rem" : "1rem",
+                        }}
+                    >
+                        {/* Search - Hidden on mobile */}
+                        {!isMobile && (
+                            <div
+                                style={{
+                                    position: "relative",
+                                    display: "flex",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Search
+                                    size={16}
+                                    style={{
+                                        position: "absolute",
+                                        left: "12px",
+                                        color: "#6b7280",
+                                    }}
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Search candidates, skills, colleges..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{
+                                        width: "300px",
+                                        padding: "0.5rem 0.5rem 0.5rem 2.5rem",
+                                        border: "1px solid #d1d5db",
+                                        borderRadius: "8px",
+                                        fontSize: "0.9rem",
+                                        outline: "none",
+                                        transition: "border-color 0.2s ease",
+                                    }}
+                                    onFocus={(e) => (e.target.style.borderColor = "#6366f1")}
+                                    onBlur={(e) => (e.target.style.borderColor = "#d1d5db")}
+                                />
+                            </div>
+                        )}
+
+                        {/* Notifications */}
+                        <div
+                            style={{
+                                position: "relative",
                                 cursor: "pointer",
                             }}
                         >
-                            Talent on <span style={{ color: "#6CCED5" }}>Cloud</span>
-                        </span>
-                        <span
+                            <button
+                                style={{
+                                    backgroundColor: "transparent",
+                                    border: "none",
+                                    padding: "0.5rem",
+                                    borderRadius: "8px",
+                                    cursor: "pointer",
+                                    transition: "background-color 0.2s ease",
+                                    position: "relative",
+                                }}
+                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                            >
+                                <Bell size={20} color="#4b5563" />
+                                <div
+                                    style={{
+                                        position: "absolute",
+                                        top: "6px",
+                                        right: "6px",
+                                        width: "8px",
+                                        height: "8px",
+                                        backgroundColor: "#ef4444",
+                                        borderRadius: "50%",
+                                        border: "2px solid white",
+                                    }}
+                                />
+                            </button>
+                        </div>
+
+                        {/* User Profile */}
+                        <div
                             style={{
-                                fontSize: "0.75rem",
-                                color: "#6b7280",
-                                fontWeight: "400",
-                                marginBottom: "2px",
-                                whiteSpace: "nowrap",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                cursor: "pointer",
+                                padding: "0.5rem",
+                                borderRadius: "8px",
+                                transition: "background-color 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                        >
+                            <div
+                                style={{
+                                    width: "32px",
+                                    height: "32px",
+                                    backgroundColor: "#6366f1",
+                                    borderRadius: "50%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "white",
+                                    fontSize: "0.9rem",
+                                    fontWeight: "600",
+                                }}
+                            >
+                                HR
+                            </div>
+                            {!isMobile && (
+                                <>
+                                    <span style={{ fontSize: "0.9rem", fontWeight: "500", color: "#4b5563" }}>HR Manager</span>
+                                    <ChevronDown size={16} color="#6b7280" />
+                                </>
+                            )}
+                        </div>
+
+                        {/* Mobile Menu Button */}
+                        {isMobile && (
+                            <button
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "44px",
+                                    height: "44px",
+                                    border: "none",
+                                    backgroundColor: "transparent",
+                                    cursor: "pointer",
+                                    borderRadius: "8px",
+                                    transition: "background-color 0.2s ease",
+                                    color: "#4b5563",
+                                }}
+                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                            >
+                                {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Mobile Menu */}
+                {isMobile && isMenuOpen && (
+                    <div
+                        style={{
+                            backgroundColor: "white",
+                            borderTop: "1px solid #e5e7eb",
+                            padding: "1rem",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                        }}
+                    >
+                        {/* Mobile Search */}
+                        <div
+                            style={{
+                                position: "relative",
+                                display: "flex",
+                                alignItems: "center",
+                                marginBottom: "1rem",
                             }}
                         >
-                            powered by
-                        </span>
+                            <Search
+                                size={16}
+                                style={{
+                                    position: "absolute",
+                                    left: "12px",
+                                    color: "#6b7280",
+                                }}
+                            />
+                            <input
+                                type="text"
+                                placeholder="Search candidates, skills, colleges..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                style={{
+                                    width: "100%",
+                                    padding: "0.75rem 0.75rem 0.75rem 2.5rem",
+                                    border: "1px solid #d1d5db",
+                                    borderRadius: "8px",
+                                    fontSize: "0.9rem",
+                                    outline: "none",
+                                }}
+                            />
+                        </div>
+
+                        {/* Mobile Navigation */}
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "0.5rem",
+                            }}
+                        >
+                            {navigationItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.75rem",
+                                        padding: "0.75rem",
+                                        backgroundColor: item.active ? "#eff6ff" : "transparent",
+                                        color: item.active ? "#6366f1" : "#4b5563",
+                                        border: "none",
+                                        borderRadius: "8px",
+                                        fontSize: "0.95rem",
+                                        fontWeight: "500",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s ease",
+                                        textAlign: "left",
+                                        width: "100%",
+                                    }}
+                                >
+                                    {item.icon}
+                                    {item.name}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                    <img
-                        src="https://i.ibb.co/SDgt4CsH/dyn.jpg"
-                        alt="Talent on Cloud"
+                )}
+            </header>
+
+            {/* Main Layout */}
+            <div
+                style={{
+                    display: "flex",
+                    minHeight: "calc(100vh - 70px)",
+                    maxWidth: "1400px",
+                    margin: "0 auto",
+                }}
+            >
+                {/* Desktop Sidebar */}
+                {!isMobile && (
+                    <aside
                         style={{
-                            width: "130px",
-                            height: "35px",
-                            objectFit: "cover",
-                            marginLeft: "-10px",
-                            marginTop: "2vw",
+                            width: "280px",
+                            backgroundColor: "white",
+                            borderRight: "1px solid #e5e7eb",
+                            padding: "2rem 0",
+                            position: "sticky",
+                            top: "70px",
+                            height: "calc(100vh - 70px)",
+                            overflowY: "auto",
                         }}
-                    />
-                </div>
+                    >
+                        <nav
+                            style={{
+                                padding: "0 1rem",
+                            }}
+                        >
+                            {navigationItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.75rem",
+                                        padding: "0.75rem 1rem",
+                                        backgroundColor: item.active ? "#eff6ff" : "transparent",
+                                        color: item.active ? "#6366f1" : "#4b5563",
+                                        border: "none",
+                                        borderRadius: "8px",
+                                        fontSize: "0.95rem",
+                                        fontWeight: item.active ? "600" : "500",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s ease",
+                                        textAlign: "left",
+                                        width: "100%",
+                                        marginBottom: "0.5rem",
+                                        borderLeft: item.active ? "3px solid #6366f1" : "3px solid transparent",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (!item.active) {
+                                            e.target.style.backgroundColor = "#f9fafb"
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (!item.active) {
+                                            e.target.style.backgroundColor = "transparent"
+                                        }
+                                    }}
+                                >
+                                    {item.icon}
+                                    {item.name}
+                                </button>
+                            ))}
+                        </nav>
 
-                {/* <div style={navStyle}>
-                    <div style={navItemStyle}>Dashboard</div>
-                    <div style={activeNavItemStyle}>External</div>
-                    <div style={navItemStyle}>Applications</div>
-                </div> */}
-
-                <div style={headerActionsStyle}>
-                    <Button type="text" icon={<BellOutlined />} style={{ fontSize: "clamp(16px, 1.4vw, 18px)" }} />
-                    <Button type="text" icon={<UserOutlined />} style={{ fontSize: "clamp(16px, 1.4vw, 18px)" }} />
-                    <Avatar
-                        size={32}
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-                        style={{ cursor: "pointer" }}
-                    />
-                </div>
-            </Header>
-
-            <Layout>
-                {/* Sidebar */}
-                <Sider style={siderStyle} width="clamp(200px, 15vw, 240px)">
-                    <div style={siderMenuStyle}>
-                        <div style={menuItemStyle}>
-                            <UserOutlined />
-                            <span>Dashboard</span>
+                        {/* Sidebar Footer */}
+                        <div
+                            style={{
+                                position: "absolute",
+                                bottom: "2rem",
+                                left: "1rem",
+                                right: "1rem",
+                            }}
+                        >
+                            <button
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.75rem",
+                                    padding: "0.75rem 1rem",
+                                    backgroundColor: "transparent",
+                                    color: "#4b5563",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    fontSize: "0.95rem",
+                                    fontWeight: "500",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    textAlign: "left",
+                                    width: "100%",
+                                    marginBottom: "0.5rem",
+                                }}
+                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f9fafb")}
+                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                            >
+                                <Settings size={20} />
+                                Settings
+                            </button>
+                            <button
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.75rem",
+                                    padding: "0.75rem 1rem",
+                                    backgroundColor: "transparent",
+                                    color: "#4b5563",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    fontSize: "0.95rem",
+                                    fontWeight: "500",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    textAlign: "left",
+                                    width: "100%",
+                                }}
+                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f9fafb")}
+                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                            >
+                                <LogOut size={20} />
+                                Logout
+                            </button>
                         </div>
-                        <div style={activeMenuItemStyle}>
-                            <UserOutlined />
-                            <span>External Candidates</span>
-                        </div>
-                        <div style={menuItemStyle}>
-                            <UserOutlined />
-                            <span>External Applications</span>
-                        </div>
-                    </div>
-                </Sider>
+                    </aside>
+                )}
 
                 {/* Main Content */}
-                <Content style={contentStyle}>
-                    {/* Title Section */}
-                    <div style={titleSectionStyle}>
+                <main
+                    style={{
+                        flex: 1,
+                        padding: isMobile ? "1rem" : "2rem",
+                        backgroundColor: "#f8fafc",
+                        minHeight: "calc(100vh - 70px)",
+                    }}
+                >
+                    {/* Page Header */}
+                    <div
+                        style={{
+                            marginBottom: "2rem",
+                        }}
+                    >
                         <div
                             style={{
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "space-between",
-                                marginBottom: "clamp(8px, 1vw, 12px)",
-                                flexWrap: "wrap",
-                                gap: "clamp(12px, 1.5vw, 16px)",
+                                marginBottom: "0.5rem",
+                                flexDirection: isMobile ? "column" : "row",
+                                gap: isMobile ? "1rem" : "0",
                             }}
                         >
-                            <Title
-                                level={2}
+                            <h1
                                 style={{
-                                    fontSize: "clamp(20px, 2.5vw, 24px)",
-                                    fontWeight: "600",
-                                    color: "#1a1a1a",
+                                    fontSize: isMobile ? "1.75rem" : "2rem",
+                                    fontWeight: "700",
+                                    color: "#1f2937",
                                     margin: 0,
                                 }}
                             >
                                 External Candidates
-                            </Title>
-                            <Button
-                                type="primary"
-                                icon={<PlusOutlined />}
+                            </h1>
+                            <button
                                 style={{
-                                    background: "#667eea",
-                                    borderColor: "#667eea",
-                                    borderRadius: "6px",
-                                    fontSize: "clamp(13px, 1.1vw, 14px)",
-                                    height: "clamp(32px, 3.5vw, 36px)",
+                                    backgroundColor: "#6366f1",
+                                    color: "white",
+                                    border: "none",
+                                    padding: "0.6rem 1.2rem",
+                                    borderRadius: "8px",
+                                    fontSize: "0.9rem",
+                                    fontWeight: "600",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.5rem",
                                 }}
+                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#5856eb")}
+                                onMouseLeave={(e) => (e.target.style.backgroundColor = "#6366f1")}
                             >
-                                Add New External Candidate
-                            </Button>
+                                <Plus size={16} />
+                                Post New Job
+                            </button>
                         </div>
-                        <Text
+                        <p
                             style={{
-                                fontSize: "clamp(14px, 1.2vw, 15px)",
-                                color: "#666",
+                                fontSize: "1rem",
+                                color: "#6b7280",
+                                margin: 0,
                             }}
                         >
-                            A detailed list of candidates from other companies, showcasing their skills, experience, and availability
-                            for potential job openings.
-                        </Text>
+                            Fresh talent and job seekers applying for positions at your company.
+                        </p>
                     </div>
 
-                    {/* Stats Row */}
-                    <Row gutter={[16, 16]} style={statsRowStyle}>
-                        <Col xs={12} sm={6}>
-                            <div style={statCardStyle}>
-                                <span style={statNumberStyle}>245</span>
-                                <div style={statLabelStyle}>Total External Candidates</div>
-                                <div style={statDescStyle}>Current pool of external talents</div>
-                            </div>
-                        </Col>
-                        <Col xs={12} sm={6}>
-                            <div style={statCardStyle}>
-                                <span style={statNumberStyle}>68</span>
-                                <div style={statLabelStyle}>Immediately Available</div>
-                                <div style={statDescStyle}>Ready to start new roles</div>
-                            </div>
-                        </Col>
-                        <Col xs={12} sm={6}>
-                            <div style={statCardStyle}>
-                                <span style={statNumberStyle}>AI/ML Devs</span>
-                                <div style={statLabelStyle}>Top Skill Demand</div>
-                                <div style={statDescStyle}>Most frequently searched skill</div>
-                            </div>
-                        </Col>
-                        <Col xs={12} sm={6}>
-                            <div style={statCardStyle}>
-                                <span style={statNumberStyle}>12</span>
-                                <div style={statLabelStyle}>New Candidates This Week</div>
-                                <div style={statDescStyle}>Fresh profiles added recently</div>
-                            </div>
-                        </Col>
-                    </Row>
-
-                    {/* Filter Section */}
-                    <div style={filterSectionStyle}>
-                        <Input
-                            placeholder="Search candidates by name or skill..."
-                            prefix={<SearchOutlined style={{ color: "#999" }} />}
-                            style={{
-                                flex: 1,
-                                maxWidth: "clamp(200px, 25vw, 300px)",
-                                borderRadius: "6px",
-                                fontSize: "clamp(13px, 1.1vw, 14px)",
-                            }}
-                        />
-                        <Select
-                            defaultValue="Skills"
-                            style={{
-                                width: "clamp(100px, 12vw, 120px)",
-                                fontSize: "clamp(13px, 1.1vw, 14px)",
-                            }}
-                            suffixIcon={<FilterOutlined />}
-                        >
-                            <Option value="skills">Skills</Option>
-                            <Option value="react">React</Option>
-                            <Option value="python">Python</Option>
-                            <Option value="aws">AWS</Option>
-                        </Select>
-                        <Select
-                            defaultValue="Experience"
-                            style={{
-                                width: "clamp(100px, 12vw, 120px)",
-                                fontSize: "clamp(13px, 1.1vw, 14px)",
-                            }}
-                        >
-                            <Option value="experience">Experience</Option>
-                            <Option value="junior">Junior (0-2 years)</Option>
-                            <Option value="mid">Mid (3-5 years)</Option>
-                            <Option value="senior">Senior (5+ years)</Option>
-                        </Select>
-                        <Select
-                            defaultValue="Availability"
-                            style={{
-                                width: "clamp(100px, 12vw, 120px)",
-                                fontSize: "clamp(13px, 1.1vw, 14px)",
-                            }}
-                        >
-                            <Option value="availability">Availability</Option>
-                            <Option value="immediate">Immediately Available</Option>
-                            <Option value="notice">2 Weeks Notice</Option>
-                            <Option value="negotiable">Negotiable</Option>
-                        </Select>
-                        <Button
-                            type="text"
-                            style={{
-                                fontSize: "clamp(13px, 1.1vw, 14px)",
-                                color: "#667eea",
-                            }}
-                        >
-                            Clear Filters
-                        </Button>
-                    </div>
-
-                    {/* Candidates Grid */}
+                    {/* Stats Cards */}
                     <div
                         style={{
-                            marginBottom: "clamp(20px, 2.5vw, 24px)",
+                            display: "grid",
+                            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(auto-fit, minmax(200px, 1fr))",
+                            gap: "1.5rem",
+                            marginBottom: "2rem",
                         }}
                     >
-                        <Title
-                            level={4}
+                        <div
                             style={{
-                                fontSize: "clamp(16px, 1.4vw, 18px)",
-                                fontWeight: "600",
-                                color: "#1a1a1a",
-                                marginBottom: "clamp(16px, 2vw, 20px)",
+                                backgroundColor: "white",
+                                borderRadius: "12px",
+                                padding: "1.5rem",
+                                border: "1px solid #e5e7eb",
+                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                textAlign: "center",
                             }}
                         >
-                            All External Profiles
-                        </Title>
+                            <div
+                                style={{
+                                    fontSize: isMobile ? "1.75rem" : "2rem",
+                                    fontWeight: "700",
+                                    color: "#1f2937",
+                                    marginBottom: "0.5rem",
+                                }}
+                            >
+                                156
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.9rem",
+                                    fontWeight: "600",
+                                    color: "#1f2937",
+                                    marginBottom: "0.25rem",
+                                }}
+                            >
+                                Total Applications
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.8rem",
+                                    color: "#6b7280",
+                                }}
+                            >
+                                This month
+                            </div>
+                        </div>
 
-                        <Row gutter={[16, 16]}>
-                            {candidates.map((candidate) => (
-                                <Col xs={24} sm={12} lg={8} key={candidate.id}>
-                                    <div
-                                        style={candidateCardStyle}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"
-                                            e.currentTarget.style.transform = "translateY(-2px)"
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.02)"
-                                            e.currentTarget.style.transform = "translateY(0)"
+                        <div
+                            style={{
+                                backgroundColor: "white",
+                                borderRadius: "12px",
+                                padding: "1.5rem",
+                                border: "1px solid #e5e7eb",
+                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                textAlign: "center",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: isMobile ? "1.75rem" : "2rem",
+                                    fontWeight: "700",
+                                    color: "#10b981",
+                                    marginBottom: "0.5rem",
+                                }}
+                            >
+                                89
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.9rem",
+                                    fontWeight: "600",
+                                    color: "#1f2937",
+                                    marginBottom: "0.25rem",
+                                }}
+                            >
+                                Fresh Graduates
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.8rem",
+                                    color: "#6b7280",
+                                }}
+                            >
+                                2023-2024 batch
+                            </div>
+                        </div>
+
+                        <div
+                            style={{
+                                backgroundColor: "white",
+                                borderRadius: "12px",
+                                padding: "1.5rem",
+                                border: "1px solid #e5e7eb",
+                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                textAlign: "center",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: isMobile ? "1.25rem" : "1.5rem",
+                                    fontWeight: "700",
+                                    color: "#6366f1",
+                                    marginBottom: "0.5rem",
+                                }}
+                            >
+                                Tech
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.9rem",
+                                    fontWeight: "600",
+                                    color: "#1f2937",
+                                    marginBottom: "0.25rem",
+                                }}
+                            >
+                                Top Applied Domain
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.8rem",
+                                    color: "#6b7280",
+                                }}
+                            >
+                                65% of applications
+                            </div>
+                        </div>
+
+                        <div
+                            style={{
+                                backgroundColor: "white",
+                                borderRadius: "12px",
+                                padding: "1.5rem",
+                                border: "1px solid #e5e7eb",
+                                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                textAlign: "center",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: isMobile ? "1.75rem" : "2rem",
+                                    fontWeight: "700",
+                                    color: "#f59e0b",
+                                    marginBottom: "0.5rem",
+                                }}
+                            >
+                                23
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.9rem",
+                                    fontWeight: "600",
+                                    color: "#1f2937",
+                                    marginBottom: "0.25rem",
+                                }}
+                            >
+                                New Today
+                            </div>
+                            <div
+                                style={{
+                                    fontSize: "0.8rem",
+                                    color: "#6b7280",
+                                }}
+                            >
+                                Fresh applications
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Filters and Actions */}
+                    <div
+                        style={{
+                            backgroundColor: "white",
+                            borderRadius: "12px",
+                            padding: "1.5rem",
+                            border: "1px solid #e5e7eb",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                            marginBottom: "1.5rem",
+                        }}
+                    >
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                flexDirection: isMobile ? "column" : "row",
+                                gap: "1rem",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "1rem",
+                                    flexWrap: "wrap",
+                                    flex: 1,
+                                }}
+                            >
+                                <select
+                                    style={{
+                                        padding: "0.5rem 0.75rem",
+                                        border: "1px solid #d1d5db",
+                                        borderRadius: "6px",
+                                        fontSize: "0.9rem",
+                                        outline: "none",
+                                        backgroundColor: "white",
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    <option>All Skills</option>
+                                    <option>Java</option>
+                                    <option>Python</option>
+                                    <option>React</option>
+                                    <option>SQL</option>
+                                </select>
+
+                                <select
+                                    style={{
+                                        padding: "0.5rem 0.75rem",
+                                        border: "1px solid #d1d5db",
+                                        borderRadius: "6px",
+                                        fontSize: "0.9rem",
+                                        outline: "none",
+                                        backgroundColor: "white",
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    <option>All Colleges</option>
+                                    <option>IIT</option>
+                                    <option>NIT</option>
+                                    <option>Private Engineering</option>
+                                    <option>University</option>
+                                </select>
+
+                                <select
+                                    style={{
+                                        padding: "0.5rem 0.75rem",
+                                        border: "1px solid #d1d5db",
+                                        borderRadius: "6px",
+                                        fontSize: "0.9rem",
+                                        outline: "none",
+                                        backgroundColor: "white",
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    <option>All Graduation Years</option>
+                                    <option>2024</option>
+                                    <option>2023</option>
+                                    <option>2022</option>
+                                </select>
+
+                                <button
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.5rem",
+                                        padding: "0.5rem 0.75rem",
+                                        backgroundColor: "transparent",
+                                        border: "1px solid #d1d5db",
+                                        borderRadius: "6px",
+                                        fontSize: "0.9rem",
+                                        color: "#6366f1",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s ease",
+                                    }}
+                                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#f9fafb")}
+                                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                >
+                                    <Filter size={16} />
+                                    More Filters
+                                </button>
+                            </div>
+
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.75rem",
+                                }}
+                            >
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        backgroundColor: "#f3f4f6",
+                                        borderRadius: "6px",
+                                        padding: "2px",
+                                    }}
+                                >
+                                    <button
+                                        onClick={() => setViewMode("grid")}
+                                        style={{
+                                            padding: "0.5rem",
+                                            backgroundColor: viewMode === "grid" ? "white" : "transparent",
+                                            border: "none",
+                                            borderRadius: "4px",
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease",
                                         }}
                                     >
-                                        <div style={candidateHeaderStyle}>
-                                            <Avatar
-                                                size={48}
-                                                src={candidate.avatar}
+                                        <Grid size={16} color={viewMode === "grid" ? "#6366f1" : "#6b7280"} />
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode("list")}
+                                        style={{
+                                            padding: "0.5rem",
+                                            backgroundColor: viewMode === "list" ? "white" : "transparent",
+                                            border: "none",
+                                            borderRadius: "4px",
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease",
+                                        }}
+                                    >
+                                        <List size={16} color={viewMode === "list" ? "#6366f1" : "#6b7280"} />
+                                    </button>
+                                </div>
+
+                                {selectedCandidates.length > 0 && (
+                                    <button
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "0.5rem",
+                                            padding: "0.5rem 0.75rem",
+                                            backgroundColor: "#6366f1",
+                                            color: "white",
+                                            border: "none",
+                                            borderRadius: "6px",
+                                            fontSize: "0.9rem",
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease",
+                                        }}
+                                        onMouseEnter={(e) => (e.target.style.backgroundColor = "#5856eb")}
+                                        onMouseLeave={(e) => (e.target.style.backgroundColor = "#6366f1")}
+                                    >
+                                        <Download size={16} />
+                                        Export ({selectedCandidates.length})
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Status Filters */}
+                    <div
+                        style={{
+                            display: "flex",
+                            gap: "0.5rem",
+                            marginBottom: "1.5rem",
+                            overflowX: "auto",
+                            paddingBottom: "0.5rem",
+                        }}
+                    >
+                        {statusFilters.map((filter) => (
+                            <button
+                                key={filter.id}
+                                onClick={() => setActiveFilter(filter.id)}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.5rem",
+                                    padding: "0.75rem 1rem",
+                                    backgroundColor: activeFilter === filter.id ? "#6366f1" : "#f3f4f6",
+                                    color: activeFilter === filter.id ? "white" : "#4b5563",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    fontSize: "0.9rem",
+                                    fontWeight: "600",
+                                    cursor: "pointer",
+                                    transition: "all 0.2s ease",
+                                    whiteSpace: "nowrap",
+                                }}
+                                onMouseEnter={(e) => {
+                                    if (activeFilter !== filter.id) {
+                                        e.target.style.backgroundColor = "#e5e7eb"
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (activeFilter !== filter.id) {
+                                        e.target.style.backgroundColor = "#f3f4f6"
+                                    }
+                                }}
+                            >
+                                {filter.name}
+                                <span
+                                    style={{
+                                        backgroundColor: activeFilter === filter.id ? "rgba(255,255,255,0.2)" : "#d1d5db",
+                                        color: activeFilter === filter.id ? "white" : "#6b7280",
+                                        padding: "0.25rem 0.5rem",
+                                        borderRadius: "12px",
+                                        fontSize: "0.8rem",
+                                        fontWeight: "600",
+                                    }}
+                                >
+                                    {filter.count}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Candidates Content */}
+                    <div
+                        style={{
+                            backgroundColor: "white",
+                            borderRadius: "12px",
+                            border: "1px solid #e5e7eb",
+                            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                            overflow: "hidden",
+                        }}
+                    >
+                        {/* Content Header */}
+                        <div
+                            style={{
+                                padding: "1.5rem",
+                                borderBottom: "1px solid #e5e7eb",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                            }}
+                        >
+                            <div>
+                                <h3
+                                    style={{
+                                        fontSize: "1.25rem",
+                                        fontWeight: "700",
+                                        color: "#1f2937",
+                                        marginBottom: "0.25rem",
+                                    }}
+                                >
+                                    Job Applications
+                                </h3>
+                                <p
+                                    style={{
+                                        fontSize: "0.9rem",
+                                        color: "#6b7280",
+                                        margin: 0,
+                                    }}
+                                >
+                                    {filteredCandidates.length} fresh candidates and job seekers
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Grid View */}
+                        {viewMode === "grid" && (
+                            <div
+                                style={{
+                                    padding: "1.5rem",
+                                    display: "grid",
+                                    gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fill, minmax(380px, 1fr))",
+                                    gap: "1.5rem",
+                                }}
+                            >
+                                {filteredCandidates.map((candidate) => (
+                                    <div
+                                        key={candidate.id}
+                                        style={{
+                                            backgroundColor: "#f8fafc",
+                                            borderRadius: "12px",
+                                            padding: "1.5rem",
+                                            border: "1px solid #e5e7eb",
+                                            transition: "all 0.3s ease",
+                                            cursor: "pointer",
+                                            position: "relative",
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)"
+                                            e.target.style.transform = "translateY(-2px)"
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.boxShadow = "none"
+                                            e.target.style.transform = "translateY(0)"
+                                        }}
+                                    >
+                                        {/* Match Score Badge */}
+                                        <div
+                                            style={{
+                                                position: "absolute",
+                                                top: "1rem",
+                                                right: "1rem",
+                                                backgroundColor: "#10b981",
+                                                color: "white",
+                                                padding: "0.25rem 0.5rem",
+                                                borderRadius: "12px",
+                                                fontSize: "0.75rem",
+                                                fontWeight: "600",
+                                            }}
+                                        >
+                                            {candidate.matchScore}% Match
+                                        </div>
+
+                                        {/* Candidate Header */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                marginBottom: "1rem",
+                                            }}
+                                        >
+                                            <div
                                                 style={{
-                                                    flexShrink: 0,
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.75rem",
                                                 }}
-                                            />
-                                            <div style={candidateInfoStyle}>
-                                                <div style={candidateNameStyle}>{candidate.name}</div>
-                                                <div style={candidateTitleStyle}>{candidate.title}</div>
+                                            >
+                                                <img
+                                                    src={candidate.avatar || "/placeholder.svg"}
+                                                    alt={candidate.name}
+                                                    style={{
+                                                        width: "50px",
+                                                        height: "50px",
+                                                        borderRadius: "50%",
+                                                        objectFit: "cover",
+                                                    }}
+                                                />
+                                                <div>
+                                                    <h4
+                                                        style={{
+                                                            fontSize: "1.1rem",
+                                                            fontWeight: "600",
+                                                            color: "#1f2937",
+                                                            marginBottom: "0.25rem",
+                                                        }}
+                                                    >
+                                                        {candidate.name}
+                                                    </h4>
+                                                    <p
+                                                        style={{
+                                                            fontSize: "0.9rem",
+                                                            color: "#6b7280",
+                                                            margin: 0,
+                                                        }}
+                                                    >
+                                                        Applied for {candidate.appliedFor}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => toggleBookmark(candidate.id)}
+                                                style={{
+                                                    backgroundColor: "transparent",
+                                                    border: "none",
+                                                    padding: "0.5rem",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    transition: "background-color 0.2s ease",
+                                                }}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#e5e7eb")}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                            >
+                                                <Bookmark
+                                                    size={16}
+                                                    color={candidate.isBookmarked ? "#6366f1" : "#6b7280"}
+                                                    fill={candidate.isBookmarked ? "#6366f1" : "none"}
+                                                />
+                                            </button>
+                                        </div>
+
+                                        {/* Education Info */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "0.5rem",
+                                                marginBottom: "1rem",
+                                                padding: "0.75rem",
+                                                backgroundColor: "white",
+                                                borderRadius: "8px",
+                                                border: "1px solid #e5e7eb",
+                                            }}
+                                        >
+                                            <GraduationCap size={20} color="#6366f1" />
+                                            <div>
+                                                <div
+                                                    style={{
+                                                        fontSize: "0.9rem",
+                                                        fontWeight: "600",
+                                                        color: "#1f2937",
+                                                    }}
+                                                >
+                                                    {candidate.education}
+                                                </div>
+                                                <div
+                                                    style={{
+                                                        fontSize: "0.8rem",
+                                                        color: "#6b7280",
+                                                    }}
+                                                >
+                                                    {candidate.college} • {candidate.graduationYear} • CGPA: {candidate.cgpa}
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div style={candidateMetaStyle}>
-                                            <div>
-                                                <strong>Experience:</strong> {candidate.experience}
+                                        {/* Details */}
+                                        <div
+                                            style={{
+                                                marginBottom: "1rem",
+                                            }}
+                                        >
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.5rem",
+                                                    marginBottom: "0.5rem",
+                                                }}
+                                            >
+                                                <MapPin size={14} color="#6b7280" />
+                                                <span style={{ fontSize: "0.9rem", color: "#6b7280" }}>{candidate.location}</span>
                                             </div>
-                                            <div>
-                                                <strong>Availability:</strong>{" "}
-                                                <span style={{ color: getAvailabilityColor(candidate.availabilityColor) }}>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.5rem",
+                                                    marginBottom: "0.5rem",
+                                                }}
+                                            >
+                                                <Clock size={14} color="#6b7280" />
+                                                <span
+                                                    style={{
+                                                        fontSize: "0.9rem",
+                                                        color: candidate.availabilityColor,
+                                                        fontWeight: "500",
+                                                    }}
+                                                >
                                                     {candidate.availability}
+                                                </span>
+                                            </div>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.5rem",
+                                                }}
+                                            >
+                                                <Award size={14} color="#f59e0b" />
+                                                <span style={{ fontSize: "0.9rem", color: "#6b7280" }}>
+                                                    {candidate.internships} internships • {candidate.projects} projects
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <div>
+                                        {/* Skills */}
+                                        <div
+                                            style={{
+                                                marginBottom: "1rem",
+                                            }}
+                                        >
                                             <div
                                                 style={{
-                                                    fontSize: "clamp(12px, 1vw, 13px)",
-                                                    fontWeight: "500",
-                                                    color: "#1a1a1a",
-                                                    marginBottom: "clamp(6px, 0.8vw, 8px)",
+                                                    display: "flex",
+                                                    flexWrap: "wrap",
+                                                    gap: "0.5rem",
                                                 }}
                                             >
-                                                Skills:
-                                            </div>
-                                            <div style={skillsStyle}>
-                                                {candidate.skills.map((skill, index) => (
-                                                    <span key={index} style={skillTagStyle}>
+                                                {candidate.skills.slice(0, 4).map((skill, index) => (
+                                                    <span
+                                                        key={index}
+                                                        style={{
+                                                            padding: "0.25rem 0.5rem",
+                                                            backgroundColor: "#eff6ff",
+                                                            color: "#6366f1",
+                                                            borderRadius: "12px",
+                                                            fontSize: "0.75rem",
+                                                            fontWeight: "500",
+                                                            border: "1px solid #dbeafe",
+                                                        }}
+                                                    >
                                                         {skill}
                                                     </span>
                                                 ))}
+                                                {candidate.skills.length > 4 && (
+                                                    <span
+                                                        style={{
+                                                            padding: "0.25rem 0.5rem",
+                                                            backgroundColor: "#f3f4f6",
+                                                            color: "#6b7280",
+                                                            borderRadius: "12px",
+                                                            fontSize: "0.75rem",
+                                                            fontWeight: "500",
+                                                        }}
+                                                    >
+                                                        +{candidate.skills.length - 4}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 
-                                        <div style={cardActionsStyle}>
-                                            <Button
-                                                type="link"
-                                                icon={<EyeOutlined />}
+                                        {/* Expected Salary */}
+                                        <div
+                                            style={{
+                                                marginBottom: "1rem",
+                                                padding: "0.75rem",
+                                                backgroundColor: "#f0f9ff",
+                                                borderRadius: "8px",
+                                                border: "1px solid #e0f2fe",
+                                            }}
+                                        >
+                                            <div
                                                 style={{
-                                                    padding: 0,
-                                                    fontSize: "clamp(13px, 1.1vw, 14px)",
-                                                    color: "#667eea",
+                                                    fontSize: "0.8rem",
+                                                    color: "#0369a1",
+                                                    fontWeight: "500",
+                                                    marginBottom: "0.25rem",
                                                 }}
                                             >
+                                                Expected Salary
+                                            </div>
+                                            <div
+                                                style={{
+                                                    fontSize: "1rem",
+                                                    fontWeight: "600",
+                                                    color: "#0c4a6e",
+                                                }}
+                                            >
+                                                {candidate.expectedSalary}
+                                            </div>
+                                        </div>
+
+                                        {/* Status */}
+                                        <div
+                                            style={{
+                                                marginBottom: "1rem",
+                                            }}
+                                        >
+                                            <span
+                                                style={{
+                                                    padding: "0.25rem 0.75rem",
+                                                    backgroundColor: `${candidate.statusColor}20`,
+                                                    color: candidate.statusColor,
+                                                    borderRadius: "12px",
+                                                    fontSize: "0.8rem",
+                                                    fontWeight: "600",
+                                                    border: `1px solid ${candidate.statusColor}40`,
+                                                }}
+                                            >
+                                                {candidate.status}
+                                            </span>
+                                            <span
+                                                style={{
+                                                    fontSize: "0.8rem",
+                                                    color: "#6b7280",
+                                                    marginLeft: "0.5rem",
+                                                }}
+                                            >
+                                                Applied {candidate.appliedDate}
+                                            </span>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                paddingTop: "1rem",
+                                                borderTop: "1px solid #e5e7eb",
+                                            }}
+                                        >
+                                            <button
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.5rem",
+                                                    padding: "0.5rem 1rem",
+                                                    backgroundColor: "#6366f1",
+                                                    color: "white",
+                                                    border: "none",
+                                                    borderRadius: "6px",
+                                                    fontSize: "0.9rem",
+                                                    fontWeight: "500",
+                                                    cursor: "pointer",
+                                                    transition: "all 0.2s ease",
+                                                }}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#5856eb")}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = "#6366f1")}
+                                            >
+                                                <Eye size={16} />
                                                 View Profile
-                                            </Button>
-                                            <Space>
-                                                <Button
-                                                    type="text"
-                                                    icon={<ShareAltOutlined />}
-                                                    size="small"
-                                                    style={{ fontSize: "clamp(12px, 1vw, 14px)" }}
-                                                />
-                                                <Button
-                                                    type="text"
-                                                    icon={<MoreOutlined />}
-                                                    size="small"
-                                                    style={{ fontSize: "clamp(12px, 1vw, 14px)" }}
-                                                />
-                                            </Space>
+                                            </button>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.5rem",
+                                                }}
+                                            >
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "transparent",
+                                                        border: "none",
+                                                        padding: "0.5rem",
+                                                        borderRadius: "6px",
+                                                        cursor: "pointer",
+                                                        transition: "background-color 0.2s ease",
+                                                    }}
+                                                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#e5e7eb")}
+                                                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                >
+                                                    <Mail size={16} color="#6b7280" />
+                                                </button>
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "transparent",
+                                                        border: "none",
+                                                        padding: "0.5rem",
+                                                        borderRadius: "6px",
+                                                        cursor: "pointer",
+                                                        transition: "background-color 0.2s ease",
+                                                    }}
+                                                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#e5e7eb")}
+                                                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                >
+                                                    <Download size={16} color="#6b7280" />
+                                                </button>
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "transparent",
+                                                        border: "none",
+                                                        padding: "0.5rem",
+                                                        borderRadius: "6px",
+                                                        cursor: "pointer",
+                                                        transition: "background-color 0.2s ease",
+                                                    }}
+                                                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#e5e7eb")}
+                                                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                >
+                                                    <MessageCircle size={16} color="#6b7280" />
+                                                </button>
+                                                <button
+                                                    style={{
+                                                        backgroundColor: "transparent",
+                                                        border: "none",
+                                                        padding: "0.5rem",
+                                                        borderRadius: "6px",
+                                                        cursor: "pointer",
+                                                        transition: "background-color 0.2s ease",
+                                                    }}
+                                                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#e5e7eb")}
+                                                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                >
+                                                    <MoreVertical size={16} color="#6b7280" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </Col>
-                            ))}
-                        </Row>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* List View */}
+                        {viewMode === "list" && (
+                            <div
+                                style={{
+                                    overflowX: "auto",
+                                }}
+                            >
+                                <table
+                                    style={{
+                                        width: "100%",
+                                        borderCollapse: "collapse",
+                                        fontSize: "0.9rem",
+                                    }}
+                                >
+                                    <thead>
+                                        <tr
+                                            style={{
+                                                backgroundColor: "#f8fafc",
+                                                borderBottom: "1px solid #e5e7eb",
+                                            }}
+                                        >
+                                            <th
+                                                style={{
+                                                    padding: "0.75rem",
+                                                    textAlign: "left",
+                                                    fontWeight: "600",
+                                                    color: "#374151",
+                                                    fontSize: "0.85rem",
+                                                    width: "50px",
+                                                }}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    style={{
+                                                        width: "16px",
+                                                        height: "16px",
+                                                        accentColor: "#6366f1",
+                                                    }}
+                                                />
+                                            </th>
+                                            <th
+                                                style={{
+                                                    padding: "0.75rem",
+                                                    textAlign: "left",
+                                                    fontWeight: "600",
+                                                    color: "#374151",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                Candidate
+                                            </th>
+                                            <th
+                                                style={{
+                                                    padding: "0.75rem",
+                                                    textAlign: "left",
+                                                    fontWeight: "600",
+                                                    color: "#374151",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                Education
+                                            </th>
+                                            <th
+                                                style={{
+                                                    padding: "0.75rem",
+                                                    textAlign: "left",
+                                                    fontWeight: "600",
+                                                    color: "#374151",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                Skills
+                                            </th>
+                                            <th
+                                                style={{
+                                                    padding: "0.75rem",
+                                                    textAlign: "left",
+                                                    fontWeight: "600",
+                                                    color: "#374151",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                Status
+                                            </th>
+                                            <th
+                                                style={{
+                                                    padding: "0.75rem",
+                                                    textAlign: "left",
+                                                    fontWeight: "600",
+                                                    color: "#374151",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                Applied Date
+                                            </th>
+                                            <th
+                                                style={{
+                                                    padding: "0.75rem",
+                                                    textAlign: "center",
+                                                    fontWeight: "600",
+                                                    color: "#374151",
+                                                    fontSize: "0.85rem",
+                                                }}
+                                            >
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredCandidates.map((candidate) => (
+                                            <tr
+                                                key={candidate.id}
+                                                style={{
+                                                    borderBottom: "1px solid #f3f4f6",
+                                                    transition: "background-color 0.2s ease",
+                                                }}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f9fafb")}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                            >
+                                                <td style={{ padding: "1rem 0.75rem" }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedCandidates.includes(candidate.id)}
+                                                        onChange={() => handleCandidateSelect(candidate.id)}
+                                                        style={{
+                                                            width: "16px",
+                                                            height: "16px",
+                                                            accentColor: "#6366f1",
+                                                        }}
+                                                    />
+                                                </td>
+                                                <td style={{ padding: "1rem 0.75rem" }}>
+                                                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                                                        <img
+                                                            src={candidate.avatar || "/placeholder.svg"}
+                                                            alt={candidate.name}
+                                                            style={{
+                                                                width: "40px",
+                                                                height: "40px",
+                                                                borderRadius: "50%",
+                                                                objectFit: "cover",
+                                                            }}
+                                                        />
+                                                        <div>
+                                                            <div style={{ fontWeight: "600", color: "#1f2937", marginBottom: "0.25rem" }}>
+                                                                {candidate.name}
+                                                            </div>
+                                                            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+                                                                Applied for {candidate.appliedFor}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: "1rem 0.75rem" }}>
+                                                    <div>
+                                                        <div style={{ fontWeight: "500", color: "#1f2937", marginBottom: "0.25rem" }}>
+                                                            {candidate.education}
+                                                        </div>
+                                                        <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+                                                            {candidate.college} • {candidate.graduationYear}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: "1rem 0.75rem" }}>
+                                                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.25rem" }}>
+                                                        {candidate.skills.slice(0, 3).map((skill, index) => (
+                                                            <span
+                                                                key={index}
+                                                                style={{
+                                                                    padding: "0.25rem 0.5rem",
+                                                                    backgroundColor: "#eff6ff",
+                                                                    color: "#6366f1",
+                                                                    borderRadius: "12px",
+                                                                    fontSize: "0.75rem",
+                                                                    fontWeight: "500",
+                                                                    border: "1px solid #dbeafe",
+                                                                }}
+                                                            >
+                                                                {skill}
+                                                            </span>
+                                                        ))}
+                                                        {candidate.skills.length > 3 && (
+                                                            <span
+                                                                style={{
+                                                                    padding: "0.25rem 0.5rem",
+                                                                    backgroundColor: "#f3f4f6",
+                                                                    color: "#6b7280",
+                                                                    borderRadius: "12px",
+                                                                    fontSize: "0.75rem",
+                                                                    fontWeight: "500",
+                                                                }}
+                                                            >
+                                                                +{candidate.skills.length - 3}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: "1rem 0.75rem" }}>
+                                                    <span
+                                                        style={{
+                                                            padding: "0.25rem 0.75rem",
+                                                            backgroundColor: `${candidate.statusColor}20`,
+                                                            color: candidate.statusColor,
+                                                            borderRadius: "12px",
+                                                            fontSize: "0.8rem",
+                                                            fontWeight: "600",
+                                                            border: `1px solid ${candidate.statusColor}40`,
+                                                        }}
+                                                    >
+                                                        {candidate.status}
+                                                    </span>
+                                                </td>
+                                                <td style={{ padding: "1rem 0.75rem", color: "#6b7280" }}>
+                                                    <div>
+                                                        <div style={{ fontWeight: "500", color: "#1f2937" }}>{candidate.appliedDate}</div>
+                                                        <div style={{ fontSize: "0.8rem" }}>Match: {candidate.matchScore}%</div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: "1rem 0.75rem", textAlign: "center" }}>
+                                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
+                                                        <button
+                                                            style={{
+                                                                backgroundColor: "transparent",
+                                                                border: "none",
+                                                                padding: "0.25rem",
+                                                                borderRadius: "4px",
+                                                                cursor: "pointer",
+                                                                transition: "background-color 0.2s ease",
+                                                            }}
+                                                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                                            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                        >
+                                                            <Eye size={16} color="#6b7280" />
+                                                        </button>
+                                                        <button
+                                                            style={{
+                                                                backgroundColor: "transparent",
+                                                                border: "none",
+                                                                padding: "0.25rem",
+                                                                borderRadius: "4px",
+                                                                cursor: "pointer",
+                                                                transition: "background-color 0.2s ease",
+                                                            }}
+                                                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                                            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                        >
+                                                            <Mail size={16} color="#6b7280" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => toggleBookmark(candidate.id)}
+                                                            style={{
+                                                                backgroundColor: "transparent",
+                                                                border: "none",
+                                                                padding: "0.25rem",
+                                                                borderRadius: "4px",
+                                                                cursor: "pointer",
+                                                                transition: "background-color 0.2s ease",
+                                                            }}
+                                                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                                            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                        >
+                                                            <Bookmark
+                                                                size={16}
+                                                                color={candidate.isBookmarked ? "#6366f1" : "#6b7280"}
+                                                                fill={candidate.isBookmarked ? "#6366f1" : "none"}
+                                                            />
+                                                        </button>
+                                                        <button
+                                                            style={{
+                                                                backgroundColor: "transparent",
+                                                                border: "none",
+                                                                padding: "0.25rem",
+                                                                borderRadius: "4px",
+                                                                cursor: "pointer",
+                                                                transition: "background-color 0.2s ease",
+                                                            }}
+                                                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                                            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                                        >
+                                                            <MoreVertical size={16} color="#6b7280" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
+                        {/* Pagination */}
+                        <div
+                            style={{
+                                padding: "1.5rem",
+                                borderTop: "1px solid #e5e7eb",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                flexDirection: isMobile ? "column" : "row",
+                                gap: isMobile ? "1rem" : "0",
+                            }}
+                        >
+                            <div
+                                style={{
+                                    fontSize: "0.9rem",
+                                    color: "#6b7280",
+                                }}
+                            >
+                                Showing {filteredCandidates.length} of {externalCandidates.length} job applications
+                            </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.5rem",
+                                }}
+                            >
+                                <button
+                                    style={{
+                                        padding: "0.5rem 0.75rem",
+                                        backgroundColor: "transparent",
+                                        border: "1px solid #d1d5db",
+                                        borderRadius: "6px",
+                                        fontSize: "0.9rem",
+                                        color: "#4b5563",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s ease",
+                                    }}
+                                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#f9fafb")}
+                                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                >
+                                    Previous
+                                </button>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "0.25rem",
+                                    }}
+                                >
+                                    {[1, 2, 3].map((page) => (
+                                        <button
+                                            key={page}
+                                            style={{
+                                                width: "36px",
+                                                height: "36px",
+                                                backgroundColor: page === 1 ? "#6366f1" : "transparent",
+                                                color: page === 1 ? "white" : "#4b5563",
+                                                border: "1px solid #d1d5db",
+                                                borderRadius: "6px",
+                                                fontSize: "0.9rem",
+                                                cursor: "pointer",
+                                                transition: "all 0.2s ease",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (page !== 1) {
+                                                    e.target.style.backgroundColor = "#f9fafb"
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (page !== 1) {
+                                                    e.target.style.backgroundColor = "transparent"
+                                                }
+                                            }}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    style={{
+                                        padding: "0.5rem 0.75rem",
+                                        backgroundColor: "transparent",
+                                        border: "1px solid #d1d5db",
+                                        borderRadius: "6px",
+                                        fontSize: "0.9rem",
+                                        color: "#4b5563",
+                                        cursor: "pointer",
+                                        transition: "all 0.2s ease",
+                                    }}
+                                    onMouseEnter={(e) => (e.target.style.backgroundColor = "#f9fafb")}
+                                    onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </Content>
-            </Layout>
-        </Layout>
+                </main>
+            </div>
+
+            {/* Footer */}
+            <footer
+                style={{
+                    backgroundColor: "#1f2937",
+                    color: "white",
+                    padding: isMobile ? "2rem 0 1rem" : "3rem 0 2rem",
+                    marginTop: "3rem",
+                }}
+            >
+                <div
+                    style={{
+                        maxWidth: "1400px",
+                        margin: "0 auto",
+                        padding: "0 1rem",
+                    }}
+                >
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(250px, 1fr))",
+                            gap: isMobile ? "2rem" : "3rem",
+                            marginBottom: isMobile ? "2rem" : "3rem",
+                        }}
+                    >
+                        <div>
+                            <div
+                                style={{
+                                    fontSize: "1.75rem",
+                                    fontWeight: "800",
+                                    marginBottom: "1rem",
+                                }}
+                            >
+                                Talent on <span style={{ color: "#6366f1" }}>Cloud</span>
+                            </div>
+                            <p
+                                style={{
+                                    fontSize: "1rem",
+                                    color: "#d1d5db",
+                                    lineHeight: "1.7",
+                                    marginBottom: "2rem",
+                                }}
+                            >
+                                India's most trusted job portal connecting fresh talent with top employers across all industries.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4
+                                style={{
+                                    fontSize: "1.2rem",
+                                    fontWeight: "700",
+                                    marginBottom: "1.5rem",
+                                    color: "#f9fafb",
+                                }}
+                            >
+                                For Employers
+                            </h4>
+                            <ul
+                                style={{
+                                    listStyle: "none",
+                                    padding: 0,
+                                    margin: 0,
+                                }}
+                            >
+                                {["Fresh Talent", "Campus Hiring", "Internship Programs", "Graduate Recruitment"].map(
+                                    (item, index) => (
+                                        <li key={index} style={{ marginBottom: "0.75rem" }}>
+                                            <a
+                                                href="#"
+                                                style={{
+                                                    color: "#d1d5db",
+                                                    textDecoration: "none",
+                                                    fontSize: "1rem",
+                                                    transition: "all 0.2s ease",
+                                                    display: "block",
+                                                    padding: "0.25rem 0",
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    e.target.style.color = "#6366f1"
+                                                    e.target.style.paddingLeft = "0.5rem"
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.target.style.color = "#d1d5db"
+                                                    e.target.style.paddingLeft = "0"
+                                                }}
+                                            >
+                                                {item}
+                                            </a>
+                                        </li>
+                                    ),
+                                )}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4
+                                style={{
+                                    fontSize: "1.2rem",
+                                    fontWeight: "700",
+                                    marginBottom: "1.5rem",
+                                    color: "#f9fafb",
+                                }}
+                            >
+                                Support
+                            </h4>
+                            <ul
+                                style={{
+                                    listStyle: "none",
+                                    padding: 0,
+                                    margin: 0,
+                                }}
+                            >
+                                {["Help Center", "Contact Us", "Privacy Policy", "Terms of Service"].map((item, index) => (
+                                    <li key={index} style={{ marginBottom: "0.75rem" }}>
+                                        <a
+                                            href="#"
+                                            style={{
+                                                color: "#d1d5db",
+                                                textDecoration: "none",
+                                                fontSize: "1rem",
+                                                transition: "all 0.2s ease",
+                                                display: "block",
+                                                padding: "0.25rem 0",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.target.style.color = "#6366f1"
+                                                e.target.style.paddingLeft = "0.5rem"
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.target.style.color = "#d1d5db"
+                                                e.target.style.paddingLeft = "0"
+                                            }}
+                                        >
+                                            {item}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div
+                        style={{
+                            borderTop: "1px solid #374151",
+                            paddingTop: "2rem",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexDirection: isMobile ? "column" : "row",
+                            gap: isMobile ? "1rem" : "0",
+                        }}
+                    >
+                        <p
+                            style={{
+                                fontSize: "0.95rem",
+                                color: "#9ca3af",
+                                margin: 0,
+                                textAlign: isMobile ? "center" : "left",
+                            }}
+                        >
+                            © 2024 Talent on Cloud. All rights reserved. Made with ❤️ in India.
+                        </p>
+                    </div>
+                </div>
+            </footer>
+        </div>
     )
 }
-
-export default ExternalCandidates

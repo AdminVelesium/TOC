@@ -337,19 +337,6 @@ const CompanyProfile = () => {
           <div style={activeTabStyle}>Company Profile</div>
         </div> */}
 
-        <Button
-          onClick={handlejobpost}
-          type="primary"
-          style={{
-            background: "#1890ff",
-            borderColor: "#1890ff",
-            borderRadius: "6px",
-            fontSize: "clamp(13px, 1.1vw, 14px)",
-            height: "clamp(32px, 3.5vw, 36px)",
-          }}
-        >
-          Post a Job
-        </Button>
       </Header>
 
       <Layout>
@@ -864,7 +851,7 @@ const CompanyProfile = () => {
                     minWidth: "clamp(160px, 18vw, 200px)",
                   }}
                 >
-                  Continue to dashboard
+                  Proceed to Employer Workspace
                 </Button>
               </div>
             </Col>
