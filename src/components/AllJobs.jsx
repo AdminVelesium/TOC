@@ -328,20 +328,7 @@ export default function AllJobs() {
                         }}
                     >
                         <div
-                            style={{
-                                width: "32px",
-                                height: "32px",
-                                background: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-                                borderRadius: "8px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "white",
-                                fontSize: "0.9rem",
-                                fontWeight: "700",
-                            }}
                         >
-                            <Briefcase size={16} />
                         </div>
                         <div
                             style={{
@@ -350,7 +337,7 @@ export default function AllJobs() {
                                 color: "#1f2937",
                             }}
                         >
-                            Job<span style={{ color: "#3b82f6" }}>Portal</span>
+                            Talent on <span style={{ color: "#7C7FF3" }}>Cloud</span>
                         </div>
                     </div>
 
