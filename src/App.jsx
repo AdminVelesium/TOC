@@ -9,7 +9,6 @@ import {
 
 import Homepage from "./components/Homepage/Homepage";
 import CandidateProfileSetup from "./components/ProfileSetups/CandidateProfileSetup"
-import Signup from "./components/Loginandsignup/Signup";
 import Auth from "./components/Loginandsignup/Login";
 import CandidateProfile from "./components/candidate/candidate-profile";
 import CompanyProfile from "./components/company-profile";
@@ -132,7 +131,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/jobs" element={<JobPostingForm />} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/signin" element={<Auth />} />
           <Route path="/candidate/profile" element={<CandidateProfile />} />
           <Route path="/profile-setup" element={<CandidateProfileSetup />} />
