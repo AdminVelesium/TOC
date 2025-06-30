@@ -52,9 +52,7 @@ const Auth = () => {
             {/* Left Section */}
             <div style={{
                 flex: 1,
-                background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1498243691581-b145c3f54a5a')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundColor: '#007BFF', // Or any shade of blue you like
                 color: 'white',
                 display: 'flex',
                 justifyContent: 'center',
