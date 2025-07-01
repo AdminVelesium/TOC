@@ -2166,7 +2166,7 @@ export default function AllJobs() {
                                 textAlign: isMobile ? "center" : "left",
                             }}
                         >
-                            © 2024 JobPortal. All rights reserved. Made with ❤️ in India.
+                            © 2024 Talent On Cloud. All rights reserved. Made with ❤️ in India.
                         </p>
                     </div>
                 </div>
