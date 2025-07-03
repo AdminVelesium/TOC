@@ -1,44 +1,56 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Menu, X, Search, MapPin, Briefcase, Star, ChevronRight, Clock, Heart, Share2 } from "lucide-react"
+import { Menu, X, Search, MapPin, Briefcase, Star, ChevronRight, Clock, Heart, Share2, TrendingUp, Users, Award, Shield, Building2, CheckCircle, Target, Globe, Bell, Filter, SortDesc, Bookmark, Eye, Download, Calendar, MapPinIcon, DollarSign, Zap, Lightbulb, Rocket, BarChart3, ArrowRight, Play, ChevronUp, ChevronDown } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export default function JobPortalHomepage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [location, setLocation] = useState("")
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [isMobile, setIsMobile] = useState(false)
+    const [activeCategory, setActiveCategory] = useState(null)
+    const [scrolled, setScrolled] = useState(false)
 
     const navigate = useNavigate();
 
-    // Handle responsive behavior
+    // Handle responsive behavior and scroll detection
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 768)
             if (window.innerWidth >= 768) {
                 setIsMenuOpen(false)
             }
         }
 
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20)
+        }
+
         handleResize()
         window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize);
+        window.addEventListener("scroll", handleScroll)
+        return () => {
+            window.removeEventListener("resize", handleResize)
+            window.removeEventListener("scroll", handleScroll)
+        }
     }, [])
 
     const handleLogin = () => {
         navigate('/signup');
     }
 
+    const isDesktop = () => window.innerWidth >= 1024
+    const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024
+    const isMobile = () => window.innerWidth < 768
+
     const jobCategories = [
-        { name: "Information Technology", count: "25,847", icon: "💻", bgColor: "#eff6ff", iconColor: "#2563eb" },
-        { name: "Banking & Finance", count: "18,234", icon: "🏦", bgColor: "#f0fdf4", iconColor: "#16a34a" },
-        { name: "Healthcare & Medical", count: "12,567", icon: "🏥", bgColor: "#fef2f2", iconColor: "#dc2626" },
-        { name: "Education & Training", count: "9,876", icon: "📚", bgColor: "#fffbeb", iconColor: "#d97706" },
-        { name: "Sales & Marketing", count: "15,432", icon: "📈", bgColor: "#f3e8ff", iconColor: "#9333ea" },
-        { name: "Engineering", count: "21,098", icon: "⚙️", bgColor: "#ecfdf5", iconColor: "#059669" },
-        { name: "Design & Creative", count: "7,654", icon: "🎨", bgColor: "#fdf2f8", iconColor: "#ec4899" },
-        { name: "Human Resources", count: "5,321", icon: "👥", bgColor: "#f0f9ff", iconColor: "#0ea5e9" },
+        { name: "Software Development", count: "25,847", icon: "💻", bgColor: "#eff6ff", iconColor: "#2563eb" },
+        { name: "Data Science & Analytics", count: "18,234", icon: "📊", bgColor: "#f0fdf4", iconColor: "#16a34a" },
+        { name: "DevOps & Cloud", count: "12,567", icon: "☁️", bgColor: "#fef2f2", iconColor: "#dc2626" },
+        { name: "Cybersecurity", count: "9,876", icon: "🔒", bgColor: "#fffbeb", iconColor: "#d97706" },
+        { name: "UI/UX Design", count: "15,432", icon: "🎨", bgColor: "#f3e8ff", iconColor: "#9333ea" },
+        { name: "Mobile Development", count: "21,098", icon: "📱", bgColor: "#ecfdf5", iconColor: "#059669" },
+        { name: "Machine Learning & AI", count: "7,654", icon: "🤖", bgColor: "#fdf2f8", iconColor: "#ec4899" },
+        { name: "Quality Assurance", count: "5,321", icon: "🧪", bgColor: "#f0f9ff", iconColor: "#0ea5e9" },
     ]
 
     const featuredJobs = [
@@ -286,7 +298,7 @@ export default function JobPortalHomepage() {
                     </div>
 
                     {/* Desktop Navigation */}
-                    {!isMobile && (
+                    <div style={{ display: window.innerWidth >= 768 ? "flex" : "none", alignItems: "center", gap: "2rem" }}>
                         <nav
                             style={{
                                 display: "flex",
@@ -321,10 +333,8 @@ export default function JobPortalHomepage() {
                                 </a>
                             ))}
                         </nav>
-                    )}
 
-                    {/* Desktop Auth Buttons */}
-                    {!isMobile && (
+                        {/* Desktop Auth Buttons */}
                         <div
                             style={{
                                 display: "flex",
@@ -339,7 +349,8 @@ export default function JobPortalHomepage() {
                                     cursor: "pointer",
                                     transition: "color 0.2s ease",
                                     padding: "0.5rem",
-                                    marginTop: "2vw"
+                                    marginTop: "2vw",
+                                    whiteSpace: "nowrap"
                                 }}
                                 onMouseEnter={(e) => (e.target.style.color = "#6366f1")}
                                 onMouseLeave={(e) => (e.target.style.color = "#6b7280")}
@@ -359,6 +370,7 @@ export default function JobPortalHomepage() {
                                     transition: "all 0.2s ease",
                                     marginTop: "2vw",
                                     boxShadow: "0 2px 4px rgba(99, 102, 241, 0.2)",
+                                    whiteSpace: "nowrap"
                                 }}
                                 onMouseEnter={(e) => {
                                     e.target.style.backgroundColor = "#5856eb"
@@ -374,9 +386,9 @@ export default function JobPortalHomepage() {
                                 Sign In/ Sign Up
                             </button>
                         </div>
-                    )}
+                    </div>
                     {/* Mobile Menu Button */}
-                    {isMobile && (
+                    <div style={{ display: window.innerWidth < 768 ? "block" : "none" }}>
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             style={{
@@ -397,11 +409,11 @@ export default function JobPortalHomepage() {
                         >
                             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
-                    )}
+                    </div>
                 </div>
 
                 {/* Mobile Menu */}
-                {isMobile && isMenuOpen && (
+                {isMenuOpen && (
                     <div
                         style={{
                             backgroundColor: "white",
@@ -486,8 +498,8 @@ export default function JobPortalHomepage() {
             <section
                 style={{
                     background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                    padding: isMobile ? "2rem 0" : "4rem 0",
-                    minHeight: isMobile ? "auto" : "600px",
+                    padding: window.innerWidth < 768 ? "2rem 0" : "4rem 0",
+                    minHeight: window.innerWidth < 768 ? "auto" : "600px",
                     display: "flex",
                     alignItems: "center",
                     position: "relative",
@@ -520,12 +532,12 @@ export default function JobPortalHomepage() {
                     <div
                         style={{
                             textAlign: "center",
-                            marginBottom: isMobile ? "2rem" : "3rem",
+                            marginBottom: window.innerWidth < 768 ? "2rem" : "3rem",
                         }}
                     >
                         <h1
                             style={{
-                                fontSize: isMobile ? "2rem" : "3.5rem",
+                                fontSize: window.innerWidth < 768 ? "2rem" : "3.5rem",
                                 fontWeight: "800",
                                 color: "#1f2937",
                                 marginBottom: "1rem",
@@ -549,7 +561,7 @@ export default function JobPortalHomepage() {
                         </h1>
                         <p
                             style={{
-                                fontSize: isMobile ? "1rem" : "1.25rem",
+                                fontSize: window.innerWidth < 768 ? "1rem" : "1.25rem",
                                 color: "#6b7280",
                                 marginBottom: "2rem",
                                 maxWidth: "700px",
@@ -567,7 +579,7 @@ export default function JobPortalHomepage() {
                         style={{
                             backgroundColor: "white",
                             borderRadius: "16px",
-                            padding: isMobile ? "1rem" : "1.5rem",
+                            padding: window.innerWidth < 768 ? "1rem" : "1.5rem",
                             boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                             maxWidth: "900px",
                             margin: "0 auto 3rem",
@@ -577,7 +589,7 @@ export default function JobPortalHomepage() {
                         <div
                             style={{
                                 display: "flex",
-                                flexDirection: isMobile ? "column" : "row",
+                                flexDirection: window.innerWidth < 768 ? "column" : "row",
                                 gap: "1rem",
                                 alignItems: "stretch",
                             }}
@@ -651,7 +663,7 @@ export default function JobPortalHomepage() {
                                     backgroundColor: "#6366f1",
                                     color: "white",
                                     border: "none",
-                                    padding: isMobile ? "1rem 2rem" : "1rem 2.5rem",
+                                    padding: window.innerWidth < 768 ? "1rem 2rem" : "1rem 2.5rem",
                                     borderRadius: "12px",
                                     fontSize: "1rem",
                                     fontWeight: "700",
@@ -743,8 +755,8 @@ export default function JobPortalHomepage() {
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
-                            gap: isMobile ? "1rem" : "2rem",
+                            gridTemplateColumns: window.innerWidth < 768 ? "repeat(2, 1fr)" : "repeat(4, 1fr)",
+                            gap: window.innerWidth < 768 ? "1rem" : "2rem",
                             maxWidth: "800px",
                             margin: "0 auto",
                         }}
@@ -776,7 +788,7 @@ export default function JobPortalHomepage() {
                                 <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>{stat.icon}</div>
                                 <div
                                     style={{
-                                        fontSize: isMobile ? "1.5rem" : "2rem",
+                                        fontSize: window.innerWidth < 768 ? "1.5rem" : "2rem",
                                         fontWeight: "800",
                                         color: "#6366f1",
                                         marginBottom: "0.25rem",
@@ -803,7 +815,7 @@ export default function JobPortalHomepage() {
             <section
                 style={{
                     backgroundColor: "white",
-                    padding: isMobile ? "3rem 0" : "5rem 0",
+                    padding: window.innerWidth < 768 ? "3rem 0" : "5rem 0",
                 }}
             >
                 <div
@@ -813,10 +825,10 @@ export default function JobPortalHomepage() {
                         padding: "0 1rem",
                     }}
                 >
-                    <div style={{ textAlign: "center", marginBottom: isMobile ? "2rem" : "4rem" }}>
+                    <div style={{ textAlign: "center", marginBottom: window.innerWidth < 768 ? "2rem" : "4rem" }}>
                         <h2
                             style={{
-                                fontSize: isMobile ? "2rem" : "2.75rem",
+                                fontSize: window.innerWidth < 768 ? "2rem" : "2.75rem",
                                 fontWeight: "800",
                                 color: "#1f2937",
                                 marginBottom: "1rem",
@@ -827,7 +839,7 @@ export default function JobPortalHomepage() {
                         </h2>
                         <p
                             style={{
-                                fontSize: isMobile ? "1rem" : "1.2rem",
+                                fontSize: window.innerWidth < 768 ? "1rem" : "1.2rem",
                                 color: "#6b7280",
                                 maxWidth: "600px",
                                 margin: "0 auto",
@@ -841,7 +853,7 @@ export default function JobPortalHomepage() {
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(280px, 1fr))",
+                            gridTemplateColumns: window.innerWidth < 768 ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(280px, 1fr))",
                             gap: "1.5rem",
                         }}
                     >
@@ -941,11 +953,120 @@ export default function JobPortalHomepage() {
                 </div>
             </section>
 
-            {/* Featured Jobs */}
+            {/* Advanced Job Dashboard */}
             <section
                 style={{
                     backgroundColor: "#f8fafc",
-                    padding: isMobile ? "3rem 0" : "5rem 0",
+                    padding: window.innerWidth < 768 ? "2rem 0" : "3rem 0",
+                }}
+            >
+                <div
+                    style={{
+                        maxWidth: "1200px",
+                        margin: "0 auto",
+                        padding: "0 1rem",
+                    }}
+                >
+
+                </div>
+            </section>
+
+            {/* Developer Analytics Section */}
+            <section
+                style={{
+                    backgroundColor: "#f3f4f6",
+                    padding: window.innerWidth < 768 ? "2rem 0" : "3rem 0",
+                }}
+            >
+                <div
+                    style={{
+                        maxWidth: "1200px",
+                        margin: "0 auto",
+                        padding: "0 1rem",
+                    }}
+                >
+                    <h2
+                        style={{
+                            fontSize: window.innerWidth < 768 ? "1.5rem" : "2.25rem",
+                            fontWeight: "800",
+                            color: "#1f2937",
+                            marginBottom: "2rem",
+                            textAlign: "center",
+                            letterSpacing: "-0.02em",
+                        }}
+                    >
+                        Analytics for Top Developer Roles
+                    </h2>
+                    <div
+                        style={{
+                            display: "grid",
+                            gridTemplateColumns: window.innerWidth < 768 ? "repeat(1, 1fr)" : "repeat(3, 1fr)",
+                            gap: "2rem",
+                        }}
+                    >
+                        {/* Java Developers */}
+                        <div
+                            style={{
+                                backgroundColor: "white",
+                                borderRadius: "16px",
+                                padding: "2rem 1.5rem",
+                                border: "1px solid #e2e8f0",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                                textAlign: "center",
+                                transition: "all 0.3s ease",
+                            }}
+                        >
+                            <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>☕</div>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1f2937", marginBottom: "0.5rem" }}>Java Developers</h3>
+                            <p style={{ fontSize: "1.1rem", color: "#6366f1", fontWeight: "800", marginBottom: "0.5rem" }}>8,200+ Jobs</p>
+                            <p style={{ fontSize: "0.95rem", color: "#6b7280", marginBottom: "1rem" }}>Avg. Salary: ₹10-18 LPA</p>
+                            <div style={{ fontSize: "0.9rem", color: "#059669", fontWeight: "600" }}>+9% YoY Growth</div>
+                        </div>
+                        {/* Python Developers */}
+                        <div
+                            style={{
+                                backgroundColor: "white",
+                                borderRadius: "16px",
+                                padding: "2rem 1.5rem",
+                                border: "1px solid #e2e8f0",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                                textAlign: "center",
+                                transition: "all 0.3s ease",
+                            }}
+                        >
+                            <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>🐍</div>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1f2937", marginBottom: "0.5rem" }}>Python Developers</h3>
+                            <p style={{ fontSize: "1.1rem", color: "#6366f1", fontWeight: "800", marginBottom: "0.5rem" }}>7,500+ Jobs</p>
+                            <p style={{ fontSize: "0.95rem", color: "#6b7280", marginBottom: "1rem" }}>Avg. Salary: ₹11-20 LPA</p>
+                            <div style={{ fontSize: "0.9rem", color: "#059669", fontWeight: "600" }}>+11% YoY Growth</div>
+                        </div>
+                        {/* React Developers */}
+                        <div
+                            style={{
+                                backgroundColor: "white",
+                                borderRadius: "16px",
+                                padding: "2rem 1.5rem",
+                                border: "1px solid #e2e8f0",
+                                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                                textAlign: "center",
+                                transition: "all 0.3s ease",
+                            }}
+                        >
+                            <div style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>⚛️</div>
+                            <h3 style={{ fontSize: "1.25rem", fontWeight: "700", color: "#1f2937", marginBottom: "0.5rem" }}>React Developers</h3>
+                            <p style={{ fontSize: "1.1rem", color: "#6366f1", fontWeight: "800", marginBottom: "0.5rem" }}>6,900+ Jobs</p>
+                            <p style={{ fontSize: "0.95rem", color: "#6b7280", marginBottom: "1rem" }}>Avg. Salary: ₹9-17 LPA</p>
+                            <div style={{ fontSize: "0.9rem", color: "#059669", fontWeight: "600" }}>+13% YoY Growth</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Enhanced Featured Jobs with Filters */}
+            <section
+                style={{
+                    backgroundColor: "white",
+                    padding: window.innerWidth < 768 ? "3rem 0" : "5rem 0",
                 }}
             >
                 <div
@@ -959,16 +1080,16 @@ export default function JobPortalHomepage() {
                         style={{
                             display: "flex",
                             justifyContent: "space-between",
-                            alignItems: isMobile ? "flex-start" : "center",
-                            marginBottom: isMobile ? "2rem" : "4rem",
-                            flexDirection: isMobile ? "column" : "row",
-                            gap: isMobile ? "1rem" : "0",
+                            alignItems: window.innerWidth < 768 ? "flex-start" : "center",
+                            marginBottom: window.innerWidth < 768 ? "2rem" : "4rem",
+                            flexDirection: window.innerWidth < 768 ? "column" : "row",
+                            gap: window.innerWidth < 768 ? "1rem" : "0",
                         }}
                     >
                         <div>
                             <h2
                                 style={{
-                                    fontSize: isMobile ? "2rem" : "2.75rem",
+                                    fontSize: window.innerWidth < 768 ? "2rem" : "2.75rem",
                                     fontWeight: "800",
                                     color: "#1f2937",
                                     marginBottom: "1rem",
@@ -979,7 +1100,7 @@ export default function JobPortalHomepage() {
                             </h2>
                             <p
                                 style={{
-                                    fontSize: isMobile ? "1rem" : "1.2rem",
+                                    fontSize: window.innerWidth < 768 ? "1rem" : "1.2rem",
                                     color: "#6b7280",
                                     margin: 0,
                                     lineHeight: "1.6",
@@ -1023,7 +1144,7 @@ export default function JobPortalHomepage() {
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(380px, 1fr))",
+                            gridTemplateColumns: window.innerWidth < 768 ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(380px, 1fr))",
                             gap: "1.5rem",
                         }}
                     >
@@ -1071,7 +1192,6 @@ export default function JobPortalHomepage() {
                                         Urgent
                                     </div>
                                 )}
-
                                 {/* Job Header */}
                                 <div
                                     style={{
@@ -1349,7 +1469,7 @@ export default function JobPortalHomepage() {
             <section
                 style={{
                     backgroundColor: "white",
-                    padding: isMobile ? "3rem 0" : "5rem 0",
+                    padding: window.innerWidth < 768 ? "3rem 0" : "5rem 0",
                 }}
             >
                 <div
@@ -1359,10 +1479,10 @@ export default function JobPortalHomepage() {
                         padding: "0 1rem",
                     }}
                 >
-                    <div style={{ textAlign: "center", marginBottom: isMobile ? "2rem" : "4rem" }}>
+                    <div style={{ textAlign: "center", marginBottom: window.innerWidth < 768 ? "2rem" : "4rem" }}>
                         <h2
                             style={{
-                                fontSize: isMobile ? "2rem" : "2.75rem",
+                                fontSize: window.innerWidth < 768 ? "2rem" : "2.75rem",
                                 fontWeight: "800",
                                 color: "#1f2937",
                                 marginBottom: "1rem",
@@ -1373,7 +1493,7 @@ export default function JobPortalHomepage() {
                         </h2>
                         <p
                             style={{
-                                fontSize: isMobile ? "1rem" : "1.2rem",
+                                fontSize: window.innerWidth < 768 ? "1rem" : "1.2rem",
                                 color: "#6b7280",
                                 maxWidth: "600px",
                                 margin: "0 auto",
@@ -1387,7 +1507,7 @@ export default function JobPortalHomepage() {
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(300px, 1fr))",
+                            gridTemplateColumns: window.innerWidth < 768 ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(300px, 1fr))",
                             gap: "1.5rem",
                         }}
                     >
@@ -1538,7 +1658,7 @@ export default function JobPortalHomepage() {
                         ))}
                     </div>
 
-                    <div style={{ textAlign: "center", marginTop: isMobile ? "2rem" : "3rem" }}>
+                    <div style={{ textAlign: "center", marginTop: window.innerWidth < 768 ? "2rem" : "3rem" }}>
                         <button
                             style={{
                                 backgroundColor: "#6366f1",
@@ -1573,7 +1693,7 @@ export default function JobPortalHomepage() {
             <section
                 style={{
                     backgroundColor: "#f8fafc",
-                    padding: isMobile ? "3rem 0" : "5rem 0",
+                    padding: window.innerWidth < 768 ? "3rem 0" : "5rem 0",
                 }}
             >
                 <div
@@ -1583,10 +1703,10 @@ export default function JobPortalHomepage() {
                         padding: "0 1rem",
                     }}
                 >
-                    <div style={{ textAlign: "center", marginBottom: isMobile ? "2rem" : "4rem" }}>
+                    <div style={{ textAlign: "center", marginBottom: window.innerWidth < 768 ? "2rem" : "4rem" }}>
                         <h2
                             style={{
-                                fontSize: isMobile ? "2rem" : "2.75rem",
+                                fontSize: window.innerWidth < 768 ? "2rem" : "2.75rem",
                                 fontWeight: "800",
                                 color: "#1f2937",
                                 marginBottom: "1rem",
@@ -1597,7 +1717,7 @@ export default function JobPortalHomepage() {
                         </h2>
                         <p
                             style={{
-                                fontSize: isMobile ? "1rem" : "1.2rem",
+                                fontSize: window.innerWidth < 768 ? "1rem" : "1.2rem",
                                 color: "#6b7280",
                                 maxWidth: "600px",
                                 margin: "0 auto",
@@ -1611,7 +1731,7 @@ export default function JobPortalHomepage() {
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(350px, 1fr))",
+                            gridTemplateColumns: window.innerWidth < 768 ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(350px, 1fr))",
                             gap: "2rem",
                         }}
                     >
@@ -1798,7 +1918,7 @@ export default function JobPortalHomepage() {
                         ))}
                     </div>
 
-                    <div style={{ textAlign: "center", marginTop: isMobile ? "2rem" : "3rem" }}>
+                    <div style={{ textAlign: "center", marginTop: window.innerWidth < 768 ? "2rem" : "3rem" }}>
                         <button
                             style={{
                                 backgroundColor: "transparent",
@@ -1834,7 +1954,7 @@ export default function JobPortalHomepage() {
             <section
                 style={{
                     background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                    padding: isMobile ? "3rem 0" : "5rem 0",
+                    padding: window.innerWidth < 768 ? "3rem 0" : "5rem 0",
                     color: "white",
                     position: "relative",
                     overflow: "hidden",
@@ -1865,7 +1985,7 @@ export default function JobPortalHomepage() {
                 >
                     <h2
                         style={{
-                            fontSize: isMobile ? "2rem" : "3rem",
+                            fontSize: window.innerWidth < 768 ? "2rem" : "3rem",
                             fontWeight: "800",
                             marginBottom: "1rem",
                             letterSpacing: "-0.02em",
@@ -1875,7 +1995,7 @@ export default function JobPortalHomepage() {
                     </h2>
                     <p
                         style={{
-                            fontSize: isMobile ? "1.1rem" : "1.3rem",
+                            fontSize: window.innerWidth < 768 ? "1.1rem" : "1.3rem",
                             marginBottom: "2.5rem",
                             opacity: "0.95",
                             maxWidth: "700px",
@@ -1891,7 +2011,7 @@ export default function JobPortalHomepage() {
                             display: "flex",
                             justifyContent: "center",
                             gap: "1rem",
-                            flexDirection: isMobile ? "column" : "row",
+                            flexDirection: window.innerWidth < 768 ? "column" : "row",
                             alignItems: "center",
                         }}
                     >
@@ -1907,7 +2027,7 @@ export default function JobPortalHomepage() {
                                 cursor: "pointer",
                                 transition: "all 0.3s ease",
                                 boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                                minWidth: isMobile ? "100%" : "auto",
+                                minWidth: window.innerWidth < 768 ? "100%" : "auto",
                             }}
                             onMouseEnter={(e) => {
                                 e.target.style.backgroundColor = "#f8fafc"
@@ -1933,7 +2053,7 @@ export default function JobPortalHomepage() {
                                 fontWeight: "700",
                                 cursor: "pointer",
                                 transition: "all 0.3s ease",
-                                minWidth: isMobile ? "100%" : "auto",
+                                minWidth: window.innerWidth < 768 ? "100%" : "auto",
                             }}
                             onMouseEnter={(e) => {
                                 e.target.style.backgroundColor = "white"
@@ -1959,7 +2079,7 @@ export default function JobPortalHomepage() {
                 style={{
                     backgroundColor: "#1f2937",
                     color: "white",
-                    padding: isMobile ? "2rem 0 1rem" : "4rem 0 2rem",
+                    padding: window.innerWidth < 768 ? "2rem 0 1rem" : "4rem 0 2rem",
                 }}
             >
                 <div
@@ -1972,9 +2092,9 @@ export default function JobPortalHomepage() {
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: isMobile ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(250px, 1fr))",
-                            gap: isMobile ? "2rem" : "3rem",
-                            marginBottom: isMobile ? "2rem" : "3rem",
+                            gridTemplateColumns: window.innerWidth < 768 ? "repeat(1, 1fr)" : "repeat(auto-fit, minmax(250px, 1fr))",
+                            gap: window.innerWidth < 768 ? "2rem" : "3rem",
+                            marginBottom: window.innerWidth < 768 ? "2rem" : "3rem",
                         }}
                     >
                         <div>
@@ -2081,7 +2201,6 @@ export default function JobPortalHomepage() {
                                 )}
                             </ul>
                         </div>
-
                         <div>
                             <h4
                                 style={{
@@ -2209,7 +2328,7 @@ export default function JobPortalHomepage() {
                                     style={{
                                         display: "flex",
                                         gap: "0.5rem",
-                                        flexDirection: isMobile ? "column" : "row",
+                                        flexDirection: window.innerWidth < 768 ? "column" : "row",
                                     }}
                                 >
                                     <input
@@ -2265,8 +2384,8 @@ export default function JobPortalHomepage() {
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            flexDirection: isMobile ? "column" : "row",
-                            gap: isMobile ? "1rem" : "0",
+                            flexDirection: window.innerWidth < 768 ? "column" : "row",
+                            gap: window.innerWidth < 768 ? "1rem" : "0",
                         }}
                     >
                         <p
@@ -2274,7 +2393,7 @@ export default function JobPortalHomepage() {
                                 fontSize: "0.95rem",
                                 color: "#9ca3af",
                                 margin: 0,
-                                textAlign: isMobile ? "center" : "left",
+                                textAlign: window.innerWidth < 768 ? "center" : "left",
                             }}
                         >
                             © 2024 Talent on Cloud. All rights reserved. Made with ❤️ in India.
@@ -2285,7 +2404,7 @@ export default function JobPortalHomepage() {
                                 gap: "2rem",
                                 fontSize: "0.9rem",
                                 flexWrap: "wrap",
-                                justifyContent: isMobile ? "center" : "flex-end",
+                                justifyContent: window.innerWidth < 768 ? "center" : "flex-end",
                             }}
                         >
                             {["Privacy", "Terms", "Cookies", "Sitemap"].map((item, index) => (
