@@ -280,7 +280,6 @@ export default function AllJobs() {
 
     const handleJobClick = (job) => {
         setSelectedJob(job)
-        alert('working');
     }
 
     return (
