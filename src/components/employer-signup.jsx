@@ -250,7 +250,6 @@ const EmployerSignUp = () => {
                             iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
                         />
                     </Form.Item>
-
                     <div style={checkboxRowStyle}>
                         <Form.Item name="remember" valuePropName="checked" style={{ margin: 0 }}>
                             <Checkbox style={{ fontSize: "clamp(13px, 1.1vw, 14px)", color: "#666" }}>Remember me</Checkbox>
@@ -264,12 +263,10 @@ const EmployerSignUp = () => {
                         </Button>
                     </Form.Item>
                 </Form>
-
                 <div style={{ textAlign: "center" }}>
                     <Text style={{ fontSize: "clamp(13px, 1.1vw, 14px)", color: "#666", marginBottom: "clamp(16px, 2vw, 20px)", display: "block" }}>
                         Or sign in with
                     </Text>
-
                     <Space size="large" style={{ justifyContent: "center", width: "100%" }}>
                         <div
                             style={{ ...socialButtonStyle, color: "#db4437" }}
@@ -313,11 +310,8 @@ const EmployerSignUp = () => {
                     </Space>
                 </div>
             </div>
-
             {/* Footer */}
-
         </div >
     )
 }
-
 export default EmployerSignUp

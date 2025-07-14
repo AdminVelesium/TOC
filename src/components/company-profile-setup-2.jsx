@@ -22,17 +22,44 @@ import {
 import { useNavigate } from "react-router-dom"
 import { Select } from 'antd';
 
-
-
 const { Title, Text, Paragraph } = Typography
 const { TabPane } = Tabs
 const { Step } = Steps
 const { TextArea } = Input;
+const { Option } = Select;
 
 // Extracted GeneralInfoTab component from EmployerProfileSetup21
-const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
-  const [form] = Form.useForm()
-  const [logoFile, setLogoFile] = useState(null)
+const GeneralInfoTab = ({ formData, setFormData, setActiveTab, logoFileList, setLogoFileList, logoPreview, setLogoPreview, form }) => {
+  // LOGO UPLOAD: preview and always included in submission
+  const uploadProps = {
+    name: "logo",
+    multiple: false,
+    accept: "image/*",
+    fileList: logoFileList,
+    beforeUpload: (file) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("You can only upload image files!");
+        return false;
+      }
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        message.error("Image must be smaller than 2MB!");
+        return false;
+      }
+      setLogoFileList([file]);
+      const reader = new FileReader();
+      reader.onload = e => setLogoPreview(e.target.result);
+      reader.readAsDataURL(file);
+      message.success(`${file.name} uploaded successfully`);
+      return false;
+    },
+    onRemove: () => {
+      setLogoFileList([]);
+      setLogoPreview(null);
+      message.success("Logo removed successfully");
+    },
+  }
 
   // Initialize form with existing data
   useState(() => {
@@ -48,36 +75,11 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
     }
   }, [formData])
 
-  const uploadProps = {
-    name: "logo",
-    multiple: false,
-    accept: "image/*",
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith("image/")
-      if (!isImage) {
-        message.error("You can only upload image files!")
-        return false
-      }
-      const isLt2M = file.size / 1024 / 1024 < 2
-      if (!isLt2M) {
-        message.error("Image must be smaller than 2MB!")
-        return false
-      }
-      setLogoFile(file)
-      message.success(`${file.name} uploaded successfully`)
-      return false // Prevent auto upload
-    },
-    onRemove: () => {
-      setLogoFile(null)
-      message.success("Logo removed successfully")
-    },
-  }
-
   const handleSave = () => {
     form
       .validateFields()
       .then((values) => {
-        const updatedData = { ...formData, ...values, logo: logoFile }
+        const updatedData = { ...formData, ...values, logo: logoFileList[0] }
         setFormData(updatedData)
         message.success("General info saved successfully!")
         // Switch to next tab after successful validation
@@ -85,13 +87,14 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
           setActiveTab("legal");
         }
       })
-      .catch((errorInfo) => {
-        message.error("Please fix the errors in the form")
+      .catch(() => {
+        message.error("Please fix the errors in the form");
       })
   }
 
   const handleRemoveLogo = () => {
-    setLogoFile(null)
+    setLogoFileList([]);
+    setLogoPreview(null);
     message.success("Logo removed successfully")
   }
 
@@ -146,6 +149,9 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
           >
             <Form.Item
               label={<Text style={{ fontSize: "clamp(14px, 1.2vw, 16px)", color: "#666" }}>Company Logo</Text>}
+              required
+              validateStatus={logoFileList.length === 0 ? "error" : ""}
+              help={logoFileList.length === 0 ? "Please upload a company logo!" : ""}
               style={{ marginBottom: "clamp(20px, 2.5vw, 24px)" }}
             >
               <div
@@ -191,27 +197,9 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
               </div>
             </Form.Item>
 
-            {logoFile && (
-              <div
-                style={{
-                  background: "#f6ffed",
-                  border: "1px solid #b7eb8f",
-                  borderRadius: "clamp(6px, 1vw, 8px)",
-                  padding: "clamp(12px, 1.5vw, 16px)",
-                  marginBottom: "clamp(16px, 2vw, 20px)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <div>
-                    <Text strong style={{ color: "#52c41a", fontSize: "clamp(14px, 1.2vw, 16px)" }}>
-                      {logoFile.name}
-                    </Text>
-                    <div style={{ fontSize: "clamp(12px, 1vw, 14px)", color: "#666" }}>
-                      {(logoFile.size / 1024).toFixed(1)} KB
-                    </div>
-                  </div>
-                  <CheckCircleOutlined style={{ color: "#52c41a", fontSize: "clamp(16px, 1.4vw, 18px)" }} />
-                </div>
+            {logoPreview && (
+              <div style={{ margin: '12px 0', textAlign: 'center' }}>
+                <img src={logoPreview} alt="Logo Preview" style={{ maxWidth: 120, maxHeight: 120, borderRadius: 8 }} />
               </div>
             )}
 
@@ -258,10 +246,7 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
               <Form.Item
                 label={<Text style={{ fontSize: "clamp(14px, 1.2vw, 16px)", color: "#333" }}>Company Name</Text>}
                 name="companyName"
-                rules={[
-                  { required: true, message: "Please enter your company name!" },
-                  { min: 2, message: "Company name must be at least 2 characters!" },
-                ]}
+                rules={[{ required: true, message: "Please enter your company name!" }, { min: 2, message: "Company name must be at least 2 characters!" }]}
                 style={{ marginBottom: "clamp(20px, 2.5vw, 24px)" }}
               >
                 <Input
@@ -271,6 +256,8 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
                     fontSize: "clamp(14px, 1.2vw, 16px)",
                     borderRadius: "clamp(6px, 0.8vw, 8px)",
                   }}
+                  value={form.getFieldValue("companyName")}
+                  onChange={e => form.setFieldsValue({ companyName: e.target.value })}
                 />
               </Form.Item>
 
@@ -320,7 +307,6 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
                   ))}
                 </Select>
               </Form.Item>
-
               <Form.Item
                 label={<Text style={{ fontSize: "clamp(14px, 1.2vw, 16px)", color: "#333" }}>Company Website</Text>}
                 name="companyWebsite"
@@ -375,12 +361,15 @@ const GeneralInfoTab = ({ formData, setFormData, setActiveTab }) => {
 }
 
 // Main component with both tabs
-const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
-  const [form] = Form.useForm()
-  const [contactForm] = Form.useForm()
-  const navigate = useNavigate()
+const EmployerProfileSetup2 = () => {
+  // LIFT formData STATE TO PARENT
+  const [formData, setFormData] = useState({});
+  const [form] = Form.useForm();
+  const [contactForm] = Form.useForm();
+  const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState("general")
+  const [activeTab, setActiveTab] = useState("general");
+  // ADDITIONAL CONTACTS: add, edit, delete, validate at least one
   const [additionalContacts, setAdditionalContacts] = useState([
     {
       id: 1,
@@ -397,9 +386,24 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
       phone: "+1 (555) 987-6543",
     },
   ])
+
   const [isContactModalVisible, setIsContactModalVisible] = useState(false)
   const [editingContact, setEditingContact] = useState(null)
-  const [documents, setDocuments] = useState([
+  // LEGAL DOCUMENTS: Upload.Dragger for multiple files, preview, remove
+  const [documentFiles, setDocumentFiles] = useState([]);
+  const documentUploadProps = {
+    multiple: true,
+    fileList: documentFiles,
+    beforeUpload: file => {
+      setDocumentFiles(prev => [...prev, file]);
+      return false;
+    },
+    onRemove: file => {
+      setDocumentFiles(prev => prev.filter(f => f.uid !== file.uid));
+    },
+    accept: ".pdf,.jpg,.jpeg,.png"
+  };
+  const [documents] = useState([
     {
       id: 1,
       name: "Company Registration Certificate",
@@ -425,6 +429,8 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
       color: "#ff4d4f",
     },
   ])
+  const [logoFileList, setLogoFileList] = useState([]);
+  const [logoPreview, setLogoPreview] = useState(null);
 
   const containerStyle = {
     minHeight: "100vh",
@@ -567,11 +573,8 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
       }
       setIsContactModalVisible(false)
       contactForm.resetFields()
+      setEditingContact(null)
     })
-  }
-
-  const handleComplete = () => {
-    navigate("/company-profile")
   }
 
   const handleCancel = () => {
@@ -592,6 +595,63 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
       </Tag>
     )
   }
+
+  const handleSubmit = async () => {
+    try {
+      // Validate all required fields
+      await form.validateFields();
+      if (logoFileList.length === 0) {
+        message.error("Please upload a company logo!");
+        return;
+      }
+      if (documentFiles.length === 0) {
+        message.error("Please upload at least one legal document!");
+        return;
+      }
+      if (additionalContacts.length === 0) {
+        message.error("Please add at least one additional contact!");
+        return;
+      }
+      // Gather all data from your form state
+      const data = {
+        companyName: form.getFieldValue("companyName"),
+        companyDescription: form.getFieldValue("companyDescription"),
+        industryType: form.getFieldValue("industryType"),
+        companyWebsite: form.getFieldValue("companyWebsite"),
+        pan: form.getFieldValue("pan"),
+        gstin: form.getFieldValue("gstin"),
+        address: form.getFieldValue("address"),
+        primaryContact: {
+          name: form.getFieldValue("primaryContactName"),
+          email: form.getFieldValue("primaryContactEmail"),
+          phone: form.getFieldValue("primaryContactPhone"),
+          role: form.getFieldValue("primaryContactRole"),
+        },
+        additionalContacts, // from your state
+        documents, // from your state (meta info)
+      };
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(data));
+      // Append logo file
+      if (logoFileList.length > 0) {
+        formData.append("logo", logoFileList[0]);
+      }
+      // Append document files
+      documentFiles.forEach(file => {
+        formData.append("documents", file);
+      });
+      const response = await fetch("http://localhost:5000/api/company-profile-setup", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Failed to save company profile");
+      message.success("Company profile setup completed!");
+      // navigate or update UI as needed
+    } catch (error) {
+      message.error(error.message);
+    }
+  };
 
   return (
     <div
@@ -615,6 +675,11 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
               formData={formData}
               setFormData={setFormData}
               setActiveTab={setActiveTab} // Make sure this is passed
+              logoFileList={logoFileList}
+              setLogoFileList={setLogoFileList}
+              logoPreview={logoPreview}
+              setLogoPreview={setLogoPreview}
+              form={form} // Pass parent form instance
             />
           </TabPane>
           <TabPane tab="Legal & Contacts" key="legal">
@@ -651,9 +716,10 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
                         >
                           <Input
                             placeholder="ABCDE1234F"
-                            style={{ padding: "8px 12px" }}
                             maxLength={10}
-                            style={{ textTransform: "uppercase" }}
+                            style={{ padding: "8px 12px", textTransform: "uppercase" }}
+                            value={form.getFieldValue("pan")}
+                            onChange={e => form.setFieldsValue({ pan: e.target.value.toUpperCase() })}
                           />
                         </Form.Item>
                         <Text style={{ color: "#999", fontSize: "12px" }}>
@@ -681,9 +747,10 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
                         >
                           <Input
                             placeholder="22AAAAA0000A1Z5"
-                            style={{ padding: "8px 12px" }}
                             maxLength={15}
-                            style={{ textTransform: "uppercase" }}
+                            style={{ padding: "8px 12px", textTransform: "uppercase" }}
+                            value={form.getFieldValue("gstin")}
+                            onChange={e => form.setFieldsValue({ gstin: e.target.value.toUpperCase() })}
                           />
                         </Form.Item>
                         <Text style={{ color: "#999", fontSize: "12px" }}>
@@ -886,49 +953,16 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
                   <Text style={{ color: "#666", fontSize: "14px", marginBottom: "16px", display: "block" }}>
                     Upload and manage key company documents and their verification status.
                   </Text>
-
-                  <div style={{ marginBottom: "16px" }}>
-                    <div
-                      style={{
-                        background: "linear-gradient(135deg, #f6ffed, #f6ffed)",
-                        borderRadius: "8px",
-                        padding: "12px",
-                        marginBottom: "16px",
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                        <FileTextOutlined style={{ color: "#52c41a" }} />
-                        <Text strong style={{ fontSize: "14px" }}>
-                          Document Management
-                        </Text>
-                      </div>
-                      <div style={{ display: "flex", gap: "12px" }}>
-                        <div
-                          style={{
-                            background: "#fff",
-                            borderRadius: "4px",
-                            padding: "8px",
-                            flex: 1,
-                            textAlign: "center",
-                          }}
-                        >
-                          <FileTextOutlined style={{ fontSize: "24px", color: "#999", marginBottom: "4px" }} />
-                        </div>
-                        <div
-                          style={{
-                            background: "#fff",
-                            borderRadius: "4px",
-                            padding: "8px",
-                            flex: 1,
-                            textAlign: "center",
-                          }}
-                        >
-                          <FileTextOutlined style={{ fontSize: "24px", color: "#999", marginBottom: "4px" }} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
+                  <Upload.Dragger {...documentUploadProps} style={{ marginBottom: 16 }}>
+                    <p className="ant-upload-drag-icon"><UploadOutlined /></p>
+                    <p className="ant-upload-text">Click or drag files to upload legal documents (PDF, JPG, PNG)</p>
+                  </Upload.Dragger>
+                  {documentFiles.length === 0 && (
+                    <div style={{ color: 'red', marginTop: 8 }}>Please upload at least one legal document!</div>
+                  )}
+                  {documentFiles.map(file => (
+                    <li key={file.uid}>{file.name}</li>
+                  ))}
                   {documents.map((doc) => (
                     <div key={doc.id} style={documentItemStyle}>
                       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -1025,7 +1059,7 @@ const EmployerProfileSetup2 = ({ onNavigate, formData, setFormData }) => {
           type="primary"
           size="large"
           style={{ minWidth: "clamp(100px, 12vw, 120px)", fontSize: "clamp(14px, 1.2vw, 16px)" }}
-          onClick={handleComplete}
+          onClick={handleSubmit}
         >
           Complete
         </Button>

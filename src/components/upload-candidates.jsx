@@ -299,7 +299,6 @@ const UploadCandidates = () => {
                         Bulk Upload
                     </Button>
                 </div>
-
                 {/* Upload Form */}
                 <Card
                     style={{
@@ -343,7 +342,6 @@ const UploadCandidates = () => {
                                         }}
                                     />
                                 </Form.Item>
-
                                 <Form.Item label="Phone Number" name="phone" style={{ marginBottom: "clamp(16px, 3vw, 20px)" }}>
                                     <Input
                                         placeholder="+1 (555) 123-4567"

@@ -41,18 +41,10 @@ const { Step } = Steps
 const JobPostingForm = () => {
     const [form] = Form.useForm()
     const [currentStep, setCurrentStep] = useState(0)
-    const [jobDescription, setJobDescription] = useState(
-        `We are seeking a highly skilled and motivated Senior Frontend Engineer to join our dynamic team. You will be responsible for developing and maintaining user-facing applications, ensuring high performance and responsiveness to requests. This role requires a deep understanding of modern JavaScript frameworks, state management, and API integration. You will collaborate closely with product managers, UX/UI designers, and backend engineers to deliver exceptional user experiences. A strong passion for clean code, test-driven development, and continuous improvement is essential.`,
-    )
+    const [jobDescription, setJobDescription] = useState(``,)
 
     const [responsibilities, setResponsibilities] =
-        useState(`- Develop and maintain responsive web applications using React and TypeScript.
-- Implement robust and scalable features, ensuring cross-browser compatibility.
-- Collaborate with designers to translate UI/UX wireframes into high-quality code.
-- Optimize applications for maximum speed and scalability.
-- Participate in code reviews, ensuring code quality and adherence to best practices.
-- Contribute to architectural discussions and technology stack decisions.
-- Mentor junior developers and foster a collaborative team environment.`)
+        useState(``)
 
     const containerStyle = {
         minHeight: "100vh",
@@ -318,7 +310,6 @@ const JobPostingForm = () => {
                                             borderRadius: "50%",
                                             background: index === 0 ? "#667eea" : "#f0f0f0",
                                             color: index === 0 ? "#fff" : "#999",
-                                            display: "flex",
                                             alignItems: "center",
                                             justifyContent: "center",
                                             fontSize: "clamp(12px, 1.1vw, 14px)",
@@ -625,7 +616,6 @@ const JobPostingForm = () => {
                                 <Text style={sectionSubtitleStyle}>
                                     Configure how candidates apply and optional application requirements.
                                 </Text>
-
                                 <Form.Item
                                     label="Application Email"
                                     name="applicationEmail"

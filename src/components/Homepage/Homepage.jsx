@@ -1688,7 +1688,6 @@ export default function JobPortalHomepage() {
                     </div>
                 </div>
             </section>
-
             {/* Career Insights */}
             <section
                 style={{

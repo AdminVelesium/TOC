@@ -40,7 +40,6 @@ export default function AllJobs() {
                 setIsMenuOpen(false)
             }
         }
-
         handleResize()
         window.addEventListener("resize", handleResize)
         return () => window.removeEventListener("resize", handleResize)
@@ -281,6 +280,7 @@ export default function AllJobs() {
 
     const handleJobClick = (job) => {
         setSelectedJob(job)
+        alert('working');
     }
 
     return (
@@ -687,7 +687,6 @@ export default function AllJobs() {
                                 }}
                             />
                         </div>
-
                         <div
                             style={{
                                 position: "relative",
@@ -1957,7 +1956,6 @@ export default function AllJobs() {
                     </div>
                 </div>
             )}
-
             {/* Footer */}
             <footer
                 style={{
@@ -2003,7 +2001,6 @@ export default function AllJobs() {
                                 India's leading job portal connecting talented professionals with top companies across all industries.
                             </p>
                         </div>
-
                         <div>
                             <h4
                                 style={{
@@ -2051,7 +2048,6 @@ export default function AllJobs() {
                                 )}
                             </ul>
                         </div>
-
                         <div>
                             <h4
                                 style={{
@@ -2099,7 +2095,6 @@ export default function AllJobs() {
                                 )}
                             </ul>
                         </div>
-
                         <div>
                             <h4
                                 style={{

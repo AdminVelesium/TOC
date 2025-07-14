@@ -48,6 +48,11 @@ export default function CandidateProfile() {
         navigate('/all-jobs')
     }
 
+    const handleEndSession = () => {
+        localStorage.clear();
+        navigate("/login");
+    }
+
     const profileData = {
         name: "Jay Rutherford",
         title: "Senior UX/UI Designer",
@@ -94,11 +99,12 @@ export default function CandidateProfile() {
                 type: "Full-time",
                 description:
                     "Designed internal tools and dashboards for energy sector operations, focusing on data visualization and workflow optimization.",
-                achievements: [
-                    "Improved operational efficiency by 25% through dashboard redesign",
-                    "Conducted user research with 50+ field operators",
-                    "Created comprehensive design documentation and guidelines",
-                ],
+                achievements:
+                    [
+                        "Improved operational efficiency by 25% through dashboard redesign",
+                        "Conducted user research with 50+ field operators",
+                        "Created comprehensive design documentation and guidelines",
+                    ],
             },
             {
                 title: "Junior UX/UI Designer",
@@ -315,6 +321,7 @@ export default function CandidateProfile() {
                                 <span style={{ fontSize: "0.9rem", fontWeight: "500", color: "#4b5563" }}>Jay Rutherford</span>
                             </div>
                             <button
+                                onClick={handleEndSession}
                                 style={{
                                     backgroundColor: "#ef4444",
                                     color: "white",
