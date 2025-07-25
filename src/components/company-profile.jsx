@@ -1,881 +1,434 @@
 "use client"
 
-import { useState } from "react"
-import { Layout, Button, Typography, Row, Col, Card, Avatar, Tag, Space, Divider } from "antd"
-import {
-  SettingOutlined,
-  EditOutlined,
-  FileTextOutlined,
-  MessageOutlined,
-  TeamOutlined,
-  BarChartOutlined,
-  EyeOutlined,
-  DownloadOutlined,
-  CheckCircleOutlined,
-  BulbOutlined,
-  TrophyOutlined,
-  HeartOutlined,
-  UserOutlined,
-  GlobalOutlined,
-} from "@ant-design/icons"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import BusinessIcon from '@mui/icons-material/Business';
+import EditIcon from '@mui/icons-material/Edit';
+import LogoutIcon from '@mui/icons-material/Logout';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import EmailIcon from '@mui/icons-material/Email';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import Logo from "./Logo";
 
-const { Header, Sider, Content } = Layout
-const { Title, Text, Paragraph } = Typography
+export default function CompanyProfile() {
+  const [companyProfile, setCompanyProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const navigate = useNavigate();
 
-const CompanyProfile = () => {
-  const [activeTab, setActiveTab] = useState("company-profile")
-  const navigate = useNavigate()
+  const handleLogout = () => {
+    localStorage.removeItem('employerId');
+    localStorage.removeItem('token');
+    navigate('/employer-signin');
+  };
 
-  const handleDashboard = () => {
-    navigate('/employer-dashboard')
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const employerId = localStorage.getItem('employerId');
+        const token = localStorage.getItem('token');
+        if (!employerId || !token) {
+          throw new Error('No employer id found. Please login again.');
+        }
+        const response = await fetch(`https://toc-bac-1.onrender.com/api/company-profile/${employerId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include'
+        });
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message || 'Failed to fetch company profile');
+        }
+        const profileData = await response.json();
+        setCompanyProfile(profileData);
+        localStorage.setItem('companyProfile', JSON.stringify(profileData));
+      } catch (err) {
+        setError(err.message);
+        if (err.message.includes('login again')) {
+          localStorage.clear();
+          navigate('/employer-signin');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, [navigate]);
+
+  function uint8ToBase64(u8Arr) {
+    let CHUNK_SIZE = 0x8000;
+    let index = 0;
+    let length = u8Arr.length;
+    let result = '';
+    let slice;
+    while (index < length) {
+      slice = u8Arr.subarray(index, Math.min(index + CHUNK_SIZE, length));
+      result += String.fromCharCode.apply(null, slice);
+      index += CHUNK_SIZE;
+    }
+    return btoa(result);
   }
 
-  const handlejobpost = () => {
-    navigate('/jobposting')
+  // Utility to get the correct company logo URL (for static serving or base64)
+  function getCompanyLogoUrl(logo) {
+    if (!logo) return null;
+    // If logo is stored as base64 (buffer), use data URL
+    if (logo.data && logo.mimetype) {
+      // logo.data may be an array or a base64 string
+      let base64 = '';
+      if (Array.isArray(logo.data)) {
+        base64 = btoa(String.fromCharCode.apply(null, logo.data));
+      } else if (logo.data.data) {
+        base64 = uint8ToBase64(new Uint8Array(logo.data.data));
+      } else if (typeof logo.data === 'string') {
+        base64 = logo.data;
+      }
+      return `data:${logo.mimetype};base64,${base64}`;
+    }
+    // If logo is a static file path (future-proofing)
+    if (logo.path) {
+      const normPath = logo.path.replace(/\\/g, '/');
+      const idx = normPath.toLowerCase().indexOf('company_uploads/');
+      if (idx !== -1) {
+        return `https://toc-bac-1.onrender.com/${normPath.substring(idx)}`;
+      }
+      return `https://toc-bac-1.onrender.com/${normPath}`;
+    }
+    return null;
   }
 
-  const containerStyle = {
-    minHeight: "100vh",
-    background: "#f8fafc",
-    width: "100vw",
-    maxWidth: "100%",
-    overflow: "hidden",
-    boxSizing: "border-box",
+  if (loading) {
+    return <div style={{ textAlign: 'center', marginTop: '4rem' }}>Loading company profile...</div>;
+  }
+  if (error) {
+    return <div style={{ textAlign: 'center', marginTop: '4rem', color: 'red' }}>{error}</div>;
+  }
+  if (!companyProfile) {
+    return <div style={{ textAlign: 'center', marginTop: '4rem' }}>No company profile found.</div>;
   }
 
-  const headerStyle = {
-    background: "#fff",
-    padding: "0 clamp(16px, 2vw, 24px)",
-    borderBottom: "1px solid #f0f0f0",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: "clamp(56px, 7vw, 64px)",
-    position: "sticky",
-    top: 0,
-    zIndex: 100,
-  }
-
-  const logoStyle = {
-    display: "flex",
-    alignItems: "center",
-    gap: "clamp(8px, 1vw, 12px)",
-    fontSize: "clamp(16px, 1.4vw, 18px)",
-    fontWeight: "600",
-    color: "#1a1a1a",
-  }
-
-  const logoIconStyle = {
-    width: "clamp(24px, 2.5vw, 28px)",
-    height: "clamp(24px, 2.5vw, 28px)",
-    background: "linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)",
-    borderRadius: "6px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "#fff",
-    fontSize: "clamp(12px, 1.2vw, 14px)",
-    fontWeight: "bold",
-  }
-
-  const navTabsStyle = {
-    display: "flex",
-    gap: "clamp(24px, 3vw, 32px)",
-    alignItems: "center",
-  }
-
-  const tabStyle = {
-    fontSize: "clamp(14px, 1.2vw, 15px)",
-    color: "#666",
-    cursor: "pointer",
-    padding: "clamp(8px, 1vw, 10px) 0",
-    borderBottom: "2px solid transparent",
-    transition: "all 0.3s ease",
-  }
-
-  const activeTabStyle = {
-    ...tabStyle,
-    color: "#1890ff",
-    borderBottomColor: "#1890ff",
-    fontWeight: "500",
-  }
-
-  const siderStyle = {
-    background: "#fff",
-    borderRight: "1px solid #f0f0f0",
-    width: "clamp(200px, 15vw, 240px)",
-    minHeight: "calc(100vh - clamp(56px, 7vw, 64px))",
-    position: "fixed",
-    left: 0,
-    top: "clamp(56px, 7vw, 64px)",
-    zIndex: 50,
-  }
-
-  const siderMenuStyle = {
-    padding: "clamp(16px, 2vw, 20px) 0",
-  }
-
-  const menuItemStyle = {
-    padding: "clamp(10px, 1.2vw, 12px) clamp(16px, 2vw, 20px)",
-    display: "flex",
-    alignItems: "center",
-    gap: "clamp(8px, 1vw, 12px)",
-    fontSize: "clamp(13px, 1.1vw, 14px)",
-    color: "#666",
-    cursor: "pointer",
-    transition: "all 0.3s ease",
-    borderRadius: "0 20px 20px 0",
-    margin: "0 clamp(8px, 1vw, 12px) clamp(4px, 0.5vw, 6px) 0",
-  }
-
-  const activeMenuItemStyle = {
-    ...menuItemStyle,
-    background: "#1890ff",
-    color: "#fff",
-    fontWeight: "500",
-  }
-
-  const contentStyle = {
-    marginLeft: "clamp(200px, 15vw, 240px)",
-    padding: "clamp(20px, 2.5vw, 24px)",
-    minHeight: "calc(100vh - clamp(56px, 7vw, 64px))",
-    background: "#f8fafc",
-  }
-
-  const titleSectionStyle = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "clamp(24px, 3vw, 32px)",
-    flexWrap: "wrap",
-    gap: "clamp(12px, 1.5vw, 16px)",
-  }
-
-  const cardStyle = {
-    borderRadius: "clamp(8px, 1vw, 12px)",
-    border: "1px solid #f0f0f0",
-    marginBottom: "clamp(20px, 2.5vw, 24px)",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
-  }
-
-  const sectionTitleStyle = {
-    fontSize: "clamp(18px, 2vw, 20px)",
-    fontWeight: "600",
-    color: "#1a1a1a",
-    marginBottom: "clamp(16px, 2vw, 20px)",
-  }
-
-  const officeIllustrationStyle = {
-    background: "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
-    borderRadius: "clamp(8px, 1vw, 12px)",
-    padding: "clamp(24px, 3vw, 32px)",
-    marginBottom: "clamp(20px, 2.5vw, 24px)",
-    textAlign: "center",
-    position: "relative",
-    overflow: "hidden",
-    minHeight: "clamp(200px, 25vw, 280px)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }
-
-  const serviceCardStyle = {
-    textAlign: "center",
-    padding: "clamp(20px, 2.5vw, 24px)",
-    borderRadius: "clamp(8px, 1vw, 12px)",
-    border: "1px solid #f0f0f0",
-    background: "#fff",
-    height: "100%",
-    transition: "all 0.3s ease",
-    cursor: "pointer",
-  }
-
-  const serviceIconStyle = {
-    width: "clamp(48px, 5vw, 56px)",
-    height: "clamp(48px, 5vw, 56px)",
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "0 auto clamp(12px, 1.5vw, 16px) auto",
-    fontSize: "clamp(20px, 2.5vw, 24px)",
-    color: "#fff",
-  }
-
-  const valueTagStyle = {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "clamp(6px, 0.8vw, 8px)",
-    padding: "clamp(6px, 0.8vw, 8px) clamp(12px, 1.5vw, 16px)",
-    background: "#fff",
-    borderRadius: "20px",
-    border: "1px solid #e6f0ff",
-    margin: "clamp(4px, 0.5vw, 6px)",
-    fontSize: "clamp(12px, 1vw, 14px)",
-    fontWeight: "500",
-    color: "#1890ff",
-  }
-
-  const partnerLogoStyle = {
-    width: "clamp(48px, 5vw, 56px)",
-    height: "clamp(48px, 5vw, 56px)",
-    borderRadius: "clamp(8px, 1vw, 12px)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    margin: "clamp(6px, 0.8vw, 8px)",
-    fontSize: "clamp(20px, 2.5vw, 24px)",
-    color: "#fff",
-    fontWeight: "bold",
-  }
-
-  const services = [
-    {
-      icon: <FileTextOutlined />,
-      title: "Smart Applicant Tracking",
-      description:
-        "Streamline your hiring process with our AI-powered Applicant Tracking System, designed for efficiency.",
-      bgColor: "#1890ff",
-    },
-    {
-      icon: <MessageOutlined />,
-      title: "Customizable Job Listings",
-      description:
-        "Create compelling job descriptions and visually appealing listings that attract top talent, tailored to your needs.",
-      bgColor: "#52c41a",
-    },
-    {
-      icon: <TeamOutlined />,
-      title: "Integrated Communication Tools",
-      description:
-        "Communicate seamlessly with candidates through built-in messaging, scheduling, and feedback systems.",
-      bgColor: "#722ed1",
-    },
-    {
-      icon: <BarChartOutlined />,
-      title: "Performance Analytics",
-      description:
-        "Gain actionable insights into your recruitment pipeline with comprehensive analytics and reporting.",
-      bgColor: "#fa8c16",
-    },
-  ]
-
-  const partners = [
-    { name: "A", bg: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
-    { name: "M", bg: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" },
-    { name: "A", bg: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" },
-    { name: "O", bg: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" },
-    { name: "M", bg: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)" },
-    { name: "J", bg: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)" },
-    { name: "E", bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)" },
-    { name: "C", bg: "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)" },
-  ]
-
-  const documents = [
-    { name: "Company Registration Certificate", status: "Verified", color: "success" },
-    { name: "Memorandum of Association", status: "Uploaded", color: "processing" },
-    { name: "Articles of Association", status: "Uploaded", color: "processing" },
-  ]
+  // Navigation items for company
+  const navigationItems = [
+    { name: "Dashboard", href: "/company-profile", active: true },
+    { name: "Jobs", href: "/jobs", active: false },
+    { name: "Candidates", href: "/candidates", active: false },
+  ];
 
   return (
-    <Layout style={containerStyle}>
+    <div
+      style={{
+        fontFamily: "Montserrat, sans-serif",
+        lineHeight: "1.6",
+        color: "#1f2937",
+        margin: 0,
+        padding: 0,
+        backgroundColor: "#f8fafc",
+        minHeight: "100vh",
+        zoom: 0.95,
+      }}
+    >
       {/* Header */}
-      <Header style={headerStyle}>
-        {/* Logo Section from Homepage.jsx */}
+      <header
+        style={{
+          backgroundColor: "#ffffff",
+          borderBottom: "1px solid #e5e7eb",
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          height: "110px",
+        }}
+      >
         <div
           style={{
+            maxWidth: "1200px",
+            margin: "0 auto",
+            padding: "0 1rem",
             display: "flex",
+            justifyContent: "space-between",
             alignItems: "center",
-            gap: "0.5rem",
-            minWidth: 0,
+            height: "70px",
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-            <span
+          {/* Logo */}
+          <Logo />
+          {/* Navigation */}
+          <nav style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
+            {navigationItems.map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                style={{
+                  textDecoration: "none",
+                  color: item.active ? "#6366f1" : "#4b5563",
+                  fontSize: "0.95rem",
+                  fontWeight: item.active ? "600" : "500",
+                  padding: "0.5rem 0",
+                  transition: "color 0.2s ease",
+                  borderBottom: item.active ? "2px solid #6366f1" : "2px solid transparent",
+                }}
+              >
+                {item.name}
+              </a>
+            ))}
+          </nav>
+          {/* User Menu */}
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <button
+              onClick={() => navigate('/company-profile-setup-1')}
               style={{
-                fontSize: "1.65rem",
+                backgroundColor: "#6366f1",
+                color: "white",
+                border: "none",
+                padding: "0.6rem 1.2rem",
+                borderRadius: "8px",
+                fontSize: "0.9rem",
                 fontWeight: "600",
-                color: "#1f2937",
-                lineHeight: "1.1",
-                whiteSpace: "nowrap",
-                marginLeft: "-8vw",
-                marginTop: "-4vh",
                 cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
               }}
+              onMouseEnter={e => { e.target.style.backgroundColor = "#5856eb"; e.target.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.target.style.backgroundColor = "#6366f1"; e.target.style.transform = "translateY(0)"; }}
             >
-              Talent on <span style={{ color: "#6CCED5" }}>Cloud</span>
-            </span>
-            <span
+              <EditIcon style={{ fontSize: 18 }} /> Edit Profile
+            </button>
+            <button
+              onClick={handleLogout}
               style={{
-                fontSize: "0.75rem",
-                color: "#6b7280",
-                fontWeight: "400",
-                marginBottom: "2px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              powered by
-            </span>
-          </div>
-          <img
-            src="https://i.ibb.co/SDgt4CsH/dyn.jpg"
-            alt="Talent on Cloud"
-            style={{
-              width: "130px",
-              height: "35px",
-              objectFit: "cover",
-              marginLeft: "-10px",
-              marginTop: "2vw",
-            }}
-          />
-        </div>
-
-        {/* <div style={navTabsStyle}>
-          <div style={tabStyle}>Profile Setup 1</div>
-          <div style={tabStyle}>Profile Setup 2</div>
-          <div style={activeTabStyle}>Company Profile</div>
-        </div> */}
-
-      </Header>
-
-      <Layout>
-        {/* Sidebar */}
-        <Sider style={siderStyle} width="clamp(200px, 15vw, 240px)">
-          <div style={siderMenuStyle}>
-            <div style={menuItemStyle}>
-              <UserOutlined />
-              <span>Profile Setup 1</span>
-            </div>
-            <div style={menuItemStyle}>
-              <UserOutlined />
-              <span>Profile Setup 2</span>
-            </div>
-            <div style={activeMenuItemStyle}>
-              <CheckCircleOutlined />
-              <span>Company Profile</span>
-            </div>
-          </div>
-
-          <Divider style={{ margin: "0" }} />
-
-          <div style={{ padding: "clamp(16px, 2vw, 20px)" }}>
-            <div style={menuItemStyle}>
-              <SettingOutlined />
-              <span>Settings</span>
-            </div>
-          </div>
-        </Sider>
-
-        {/* Main Content */}
-        <Content style={contentStyle}>
-          {/* Title Section */}
-          <div style={titleSectionStyle}>
-            <Title
-              level={2}
-              style={{
-                fontSize: "clamp(20px, 2.5vw, 24px)",
+                backgroundColor: "#ef4444",
+                color: "white",
+                border: "none",
+                padding: "0.6rem 1.2rem",
+                borderRadius: "8px",
+                fontSize: "0.9rem",
                 fontWeight: "600",
-                color: "#1a1a1a",
-                margin: 0,
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
               }}
+              onMouseEnter={e => { e.target.style.backgroundColor = "#dc2626"; e.target.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.target.style.backgroundColor = "#ef4444"; e.target.style.transform = "translateY(0)"; }}
             >
-              Company Profile
-            </Title>
-            <Button
-              type="primary"
-              icon={<EditOutlined />}
-              style={{
-                background: "#1890ff",
-                borderColor: "#1890ff",
-                borderRadius: "6px",
-                fontSize: "clamp(13px, 1.1vw, 14px)",
-                height: "clamp(32px, 3.5vw, 36px)",
-              }}
-            >
-              Edit Profile
-            </Button>
+              <LogoutIcon style={{ fontSize: 18 }} /> Logout
+            </button>
           </div>
+        </div>
+      </header>
 
-          <Row gutter={[24, 24]}>
-            {/* Left Column */}
-            <Col xs={24} lg={16}>
-              {/* About Section */}
-              <Card style={cardStyle}>
-                <Title level={3} style={sectionTitleStyle}>
-                  About React Job Portal
-                </Title>
-
-                <div style={officeIllustrationStyle}>
-                  {/* Office Illustration */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "clamp(16px, 2vw, 24px)",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {/* Team Members */}
-                    {[
-                      { bg: "#ff6b6b", emoji: "👩‍💼" },
-                      { bg: "#4ecdc4", emoji: "👨‍💻" },
-                      { bg: "#45b7d1", emoji: "👩‍💻" },
-                      { bg: "#f9ca24", emoji: "👨‍💼" },
-                      { bg: "#6c5ce7", emoji: "👩‍🎨" },
-                    ].map((person, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          width: "clamp(48px, 5vw, 60px)",
-                          height: "clamp(48px, 5vw, 60px)",
-                          borderRadius: "50%",
-                          background: person.bg,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          fontSize: "clamp(20px, 2.5vw, 24px)",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                        }}
-                      >
-                        {person.emoji}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Decorative Elements */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "clamp(16px, 2vw, 24px)",
-                      bottom: "clamp(16px, 2vw, 24px)",
-                      fontSize: "clamp(24px, 3vw, 32px)",
-                    }}
-                  >
-                    🌿
-                  </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: "clamp(16px, 2vw, 24px)",
-                      bottom: "clamp(16px, 2vw, 24px)",
-                      fontSize: "clamp(24px, 3vw, 32px)",
-                    }}
-                  >
-                    🌱
-                  </div>
-                </div>
-
-                <Paragraph
-                  style={{
-                    fontSize: "clamp(14px, 1.2vw, 16px)",
-                    lineHeight: "1.6",
-                    color: "#555",
-                    marginBottom: 0,
-                  }}
-                >
-                  React Job Portal is dedicated to revolutionizing the hiring landscape. We empower companies to
-                  efficiently manage their recruitment processes, from brand building to applicant tracking. Our
-                  intuitive platform ensures a seamless experience for both employers and job seekers, fostering
-                  successful connections worldwide. We believe in innovation, user-centric design, and building strong,
-                  lasting connections within the professional community.
-                </Paragraph>
-              </Card>
-
-              {/* Legal Compliance Section */}
-              <Card style={cardStyle}>
-                <Title level={3} style={sectionTitleStyle}>
-                  Legal Compliance & Business Details
-                </Title>
-
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} md={12}>
-                    <div style={{ marginBottom: "clamp(16px, 2vw, 20px)" }}>
-                      <Text strong style={{ display: "block", marginBottom: "4px" }}>
-                        Permanent Account Number (PAN)
-                      </Text>
-                      <Text style={{ color: "#666" }}>XXXXXXXXX</Text>
-                    </div>
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <div style={{ marginBottom: "clamp(16px, 2vw, 20px)" }}>
-                      <Text strong style={{ display: "block", marginBottom: "4px" }}>
-                        Company Website
-                      </Text>
-                      <Text style={{ color: "#1890ff" }}>https://www.reactjobportal.com</Text>
-                    </div>
-                  </Col>
-                  <Col xs={24}>
-                    <div style={{ marginBottom: "clamp(16px, 2vw, 20px)" }}>
-                      <Text strong style={{ display: "block", marginBottom: "4px" }}>
-                        Goods and Services Tax Identification Number (GSTIN)
-                      </Text>
-                      <Text style={{ color: "#666" }}>22AAAAAAAAAAA1Z5</Text>
-                    </div>
-                  </Col>
-                  <Col xs={24}>
-                    <div>
-                      <Text strong style={{ display: "block", marginBottom: "4px" }}>
-                        Registered Company Address
-                      </Text>
-                      <Text style={{ color: "#666" }}>123 Main Street, Suite 400, New York, NY 10001, USA</Text>
-                    </div>
-                  </Col>
-                </Row>
-              </Card>
-
-              {/* HR & Communication Contacts */}
-              <Card style={cardStyle}>
-                <Title level={3} style={sectionTitleStyle}>
-                  HR & Communication Contacts
-                </Title>
-                <Text style={{ color: "#666", marginBottom: "clamp(20px, 2.5vw, 24px)", display: "block" }}>
-                  Manage key personnel for official communications and job applications.
-                </Text>
-
-                <div
-                  style={{
-                    background: "#f6ffed",
-                    padding: "clamp(16px, 2vw, 20px)",
-                    borderRadius: "clamp(8px, 1vw, 12px)",
-                    border: "1px solid #b7eb8f",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                    <UserOutlined style={{ color: "#52c41a" }} />
-                    <Text strong>Primary HR Contact</Text>
-                  </div>
-
-                  <Row gutter={[16, 8]}>
-                    <Col xs={24} md={12}>
-                      <Text strong style={{ display: "block" }}>
-                        Full Name
-                      </Text>
-                      <Text>Sarah Chen</Text>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Text strong style={{ display: "block" }}>
-                        Email Address
-                      </Text>
-                      <Text>sarah.chen@example.com</Text>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Text strong style={{ display: "block" }}>
-                        Phone Number
-                      </Text>
-                      <Text>+1 (555) 123-4567</Text>
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <Text strong style={{ display: "block" }}>
-                        Role/Designation
-                      </Text>
-                      <Text>Head of HR</Text>
-                    </Col>
-                  </Row>
-                </div>
-              </Card>
-
-              {/* Our Services */}
-              <Card style={cardStyle}>
-                <Title level={3} style={sectionTitleStyle}>
-                  Our Services
-                </Title>
-
-                <Row gutter={[16, 16]}>
-                  {services.map((service, index) => (
-                    <Col xs={24} sm={12} key={index}>
-                      <div
-                        style={serviceCardStyle}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"
-                          e.currentTarget.style.transform = "translateY(-2px)"
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = "none"
-                          e.currentTarget.style.transform = "translateY(0)"
-                        }}
-                      >
-                        <div style={{ ...serviceIconStyle, background: service.bgColor }}>{service.icon}</div>
-                        <Title
-                          level={4}
-                          style={{
-                            fontSize: "clamp(14px, 1.2vw, 16px)",
-                            fontWeight: "600",
-                            marginBottom: "clamp(8px, 1vw, 12px)",
-                          }}
-                        >
-                          {service.title}
-                        </Title>
-                        <Text
-                          style={{
-                            fontSize: "clamp(12px, 1vw, 14px)",
-                            color: "#666",
-                            lineHeight: "1.5",
-                            display: "block",
-                            marginBottom: "clamp(12px, 1.5vw, 16px)",
-                          }}
-                        >
-                          {service.description}
-                        </Text>
-                        <Button
-                          type="link"
-                          style={{
-                            padding: 0,
-                            fontSize: "clamp(12px, 1vw, 14px)",
-                            color: service.bgColor,
-                          }}
-                        >
-                          Learn More
-                        </Button>
-                      </div>
-                    </Col>
-                  ))}
-                </Row>
-              </Card>
-
-              {/* Our Culture & Values */}
-              <Card style={cardStyle}>
-                <Title level={3} style={sectionTitleStyle}>
-                  Our Culture & Values
-                </Title>
-
-                <div style={officeIllustrationStyle}>
-                  {/* Culture Illustration */}
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "clamp(12px, 1.5vw, 16px)",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    {[
-                      { bg: "#ff6b6b", emoji: "👩‍💼" },
-                      { bg: "#4ecdc4", emoji: "👨‍💻" },
-                      { bg: "#45b7d1", emoji: "👩‍💻" },
-                      { bg: "#f9ca24", emoji: "👨‍💼" },
-                      { bg: "#6c5ce7", emoji: "👩‍🎨" },
-                      { bg: "#e17055", emoji: "👨‍🔬" },
-                    ].map((person, index) => (
-                      <div
-                        key={index}
-                        style={{
-                          width: "clamp(40px, 4vw, 48px)",
-                          height: "clamp(40px, 4vw, 48px)",
-                          borderRadius: "50%",
-                          background: person.bg,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          fontSize: "clamp(16px, 2vw, 20px)",
-                          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                        }}
-                      >
-                        {person.emoji}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <Paragraph
-                  style={{
-                    fontSize: "clamp(14px, 1.2vw, 16px)",
-                    lineHeight: "1.6",
-                    color: "#555",
-                    marginBottom: "clamp(16px, 2vw, 20px)",
-                  }}
-                >
-                  At React Job Portal, we foster an environment of collaboration, innovation, and continuous learning.
-                  We believe in empowering our team members to achieve their full potential while creating impactful
-                  solutions for our users. Our core values include transparency, integrity, and a passion for
-                  excellence, driving us to build a better future for recruitment.
-                </Paragraph>
-
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(6px, 0.8vw, 8px)" }}>
-                  <div style={valueTagStyle}>
-                    <BulbOutlined />
-                    <span>Innovation</span>
-                  </div>
-                  <div style={valueTagStyle}>
-                    <TrophyOutlined />
-                    <span>Excellence</span>
-                  </div>
-                  <div style={valueTagStyle}>
-                    <TeamOutlined />
-                    <span>Collaboration</span>
-                  </div>
-                  <div style={valueTagStyle}>
-                    <HeartOutlined />
-                    <span>User-Centricity</span>
-                  </div>
-                  <div style={valueTagStyle}>
-                    <GlobalOutlined />
-                    <span>Global Impact</span>
-                  </div>
-                </div>
-              </Card>
-
-              {/* Our Esteemed Partners */}
-              <Card style={cardStyle}>
-                <Title level={3} style={sectionTitleStyle}>
-                  Our Esteemed Partners
-                </Title>
-
-                <div
-                  style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "clamp(8px, 1vw, 12px)" }}
-                >
-                  {partners.map((partner, index) => (
-                    <div key={index} style={{ ...partnerLogoStyle, background: partner.bg }}>
-                      {partner.name}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            </Col>
-
-            {/* Right Column */}
-            <Col xs={24} lg={8}>
-              {/* Company Logo */}
-              <Card style={cardStyle}>
-                <Title level={4} style={sectionTitleStyle}>
-                  Company Logo
-                </Title>
-                <div style={{ textAlign: "center" }}>
-                  <Avatar
-                    size={120}
-                    style={{
-                      background: "#f0f0f0",
-                      color: "#999",
-                      fontSize: "clamp(14px, 1.2vw, 16px)",
-                      marginBottom: "clamp(12px, 1.5vw, 16px)",
-                    }}
-                  >
-                  </Avatar>
-                </div>
-              </Card>
-
-              {/* Legal Documents */}
-              <Card style={cardStyle}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-                  <FileTextOutlined style={{ color: "#1890ff" }} />
-                  <Title level={4} style={{ margin: 0, fontSize: "clamp(16px, 1.4vw, 18px)" }}>
-                    Legal Documents
-                  </Title>
-                </div>
-                <Text style={{ color: "#666", marginBottom: "16px", display: "block" }}>
-                  Quick access to essential company documents.
-                </Text>
-
-                {/* Document Thumbnails */}
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "clamp(8px, 1vw, 12px)",
-                    marginBottom: "clamp(16px, 2vw, 20px)",
-                    justifyContent: "center",
-                  }}
-                >
-                  {[
-                    { bg: "#f6ffed", border: "#b7eb8f" },
-                    { bg: "#f0f9ff", border: "#91d5ff" },
-                    { bg: "#fff2e8", border: "#ffd591" },
-                  ].map((doc, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        width: "clamp(48px, 5vw, 56px)",
-                        height: "clamp(48px, 5vw, 56px)",
-                        background: doc.bg,
-                        borderRadius: "clamp(6px, 1vw, 8px)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        border: `1px solid ${doc.border}`,
-                      }}
-                    >
-                      <FileTextOutlined style={{ color: "#1890ff", fontSize: "clamp(20px, 2.5vw, 24px)" }} />
-                    </div>
-                  ))}
-                </div>
-
-                {documents.map((doc, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "clamp(8px, 1vw, 12px) 0",
-                      borderBottom: index < documents.length - 1 ? "1px solid #f0f0f0" : "none",
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <Text
-                        strong
-                        style={{
-                          display: "block",
-                          fontSize: "clamp(13px, 1.1vw, 14px)",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        {doc.name}
-                      </Text>
-                      <Tag color={doc.color} size="small">
-                        {doc.status}
-                      </Tag>
-                    </div>
-                    <Space>
-                      <Button type="text" size="small" icon={<EyeOutlined />} />
-                      <Button type="text" size="small" icon={<DownloadOutlined />} />
-                    </Space>
-                  </div>
-                ))}
-              </Card>
-
-              {/* Continue to Dashboard Button */}
-              <div style={{ textAlign: "center", marginTop: "clamp(24px, 3vw, 32px)" }}>
-                <Button
-                  onClick={handleDashboard}
-                  type="primary"
-                  size="large"
-                  style={{
-                    background: "#1890ff",
-                    borderColor: "#1890ff",
-                    borderRadius: "6px",
-                    fontSize: "clamp(14px, 1.2vw, 16px)",
-                    height: "clamp(40px, 4.5vw, 48px)",
-                    minWidth: "clamp(160px, 18vw, 200px)",
-                  }}
-                >
-                  Proceed to Employer Workspace
-                </Button>
-              </div>
-            </Col>
-          </Row>
-
-          {/* Footer */}
+      {/* Main Content */}
+      <main
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "2rem 1rem",
+          display: "flex",
+          flexDirection: "row",
+          gap: "2rem",
+        }}
+      >
+        {/* Sidebar */}
+        <aside style={{ width: "340px", flexShrink: 0 }}>
           <div
             style={{
+              backgroundColor: "white",
+              borderRadius: "16px",
+              padding: "2rem",
+              marginBottom: "1.5rem",
+              border: "1px solid #e5e7eb",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               textAlign: "center",
-              marginTop: "clamp(32px, 4vw, 40px)",
-              padding: "clamp(16px, 2vw, 20px)",
-              color: "#999",
-              fontSize: "clamp(12px, 1vw, 13px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "clamp(6px, 0.8vw, 8px)",
             }}
           >
+            {/* Company Logo */}
+            <div style={{ marginBottom: "1.5rem" }}>
+              {companyProfile.logo && getCompanyLogoUrl(companyProfile.logo) ? (
+                <img
+                  src={getCompanyLogoUrl(companyProfile.logo)}
+                  alt="Company Logo"
+                  style={{ width: 120, height: 120, borderRadius: "16px", objectFit: "cover", border: "4px solid #e0e7ff", margin: "0 auto", background: '#f3f4f6' }}
+                />
+              ) : (
+                <div style={{ width: 120, height: 120, background: "#6366f1", borderRadius: "16px", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "2.5rem", fontWeight: 700, margin: "0 auto", border: "4px solid #e0e7ff" }}>
+                  <BusinessIcon style={{ fontSize: 60 }} />
+                </div>
+              )}
+            </div>
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#1f2937", marginBottom: "0.5rem", margin: 0 }}>{companyProfile.companyName}</h1>
+            <p style={{ fontSize: "1.1rem", color: "#6b7280", marginBottom: "0.5rem", fontWeight: 500 }}>{companyProfile.industryType}</p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", color: "#6b7280", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
+              <LocationOnIcon style={{ fontSize: 18 }} />
+              <span>{companyProfile.address}</span>
+            </div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#dcfce7", color: "#166534", padding: "0.5rem 1rem", borderRadius: "20px", fontSize: "0.85rem", fontWeight: 600, marginBottom: "1.5rem" }}>
+              <div style={{ width: 8, height: 8, backgroundColor: "#10b981", borderRadius: "50%" }} />
+              Verified Company
+            </div>
+            <div style={{ marginBottom: "1.5rem" }}>
+              <a href={companyProfile.companyWebsite} target="_blank" rel="noopener noreferrer" style={{ fontSize: "0.9rem", color: "#6366f1", textDecoration: "none", fontWeight: 600 }}>
+                {companyProfile.companyWebsite}
+              </a>
+            </div>
+            <div style={{ textAlign: "left", padding: "1rem", backgroundColor: "#f8fafc", borderRadius: "8px", fontSize: "0.85rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", color: "#6b7280" }}>
+                <EmailIcon style={{ fontSize: 16 }} />
+                <span>{companyProfile.email || '-'}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", color: "#6b7280" }}>
+                <InsertDriveFileIcon style={{ fontSize: 16 }} />
+                <span>PAN: {companyProfile.pan || '-'}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "#6b7280" }}>
+                <InsertDriveFileIcon style={{ fontSize: 16 }} />
+                <span>GSTIN: {companyProfile.gstin || '-'}</span>
+              </div>
+            </div>
           </div>
-        </Content>
-      </Layout>
-    </Layout>
-  )
+        </aside>
+        {/* Main Content Area */}
+        <section style={{ flex: 1, minWidth: 0 }}>
+          {/* About Section */}
+          <div style={{ backgroundColor: "white", borderRadius: "16px", padding: "2rem", border: "1px solid #e5e7eb", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", marginBottom: "2rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+              <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#1f2937", margin: 0 }}>About</h2>
+            </div>
+            <p style={{ fontSize: "1rem", color: "#4b5563", lineHeight: "1.7", margin: 0 }}>{companyProfile.companyDescription}</p>
+          </div>
+          {/* Legal & Business Details */}
+          <div style={{ backgroundColor: "white", borderRadius: "16px", padding: "2rem", border: "1px solid #e5e7eb", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", marginBottom: "2rem" }}>
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1f2937", marginBottom: "1.5rem", margin: 0 }}>Legal & Business Details</h2>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "2rem" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, color: "#6366f1", marginBottom: 4 }}>PAN Number</div>
+                <div style={{ color: "#374151", fontSize: "1rem" }}>{companyProfile.pan || '-'}</div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, color: "#6366f1", marginBottom: 4 }}>GSTIN</div>
+                <div style={{ color: "#374151", fontSize: "1rem" }}>{companyProfile.gstin || '-'}</div>
+              </div>
+              <div style={{ flex: 2 }}>
+                <div style={{ fontWeight: 600, color: "#6366f1", marginBottom: 4 }}>Registered Address</div>
+                <div style={{ color: "#374151", fontSize: "1rem" }}>{companyProfile.address || '-'}</div>
+              </div>
+            </div>
+          </div>
+          {/* Contacts */}
+          <div style={{ backgroundColor: "white", borderRadius: "16px", padding: "2rem", border: "1px solid #e5e7eb", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", marginBottom: "2rem" }}>
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1f2937", marginBottom: "1.5rem", margin: 0 }}>Contact Information</h2>
+            {companyProfile.primaryContact && (
+              <div style={{ background: "#f0fdf4", borderRadius: 8, padding: 16, border: "1px solid #bbf7d0", marginBottom: 16 }}>
+                <div style={{ fontWeight: 600, color: "#166534", marginBottom: 8 }}>Primary Contact</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
+                  {Object.entries(companyProfile.primaryContact).map(([key, value]) => (
+                    <div key={key} style={{ flex: 1, minWidth: 120, color: "#374151", fontSize: "1rem" }}>
+                      <span style={{ fontWeight: 600 }}>{key.charAt(0).toUpperCase() + key.slice(1)}:</span> {value || "-"}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {companyProfile.additionalContacts && companyProfile.additionalContacts.length > 0 && (
+              <div>
+                <div style={{ fontWeight: 600, color: "#6366f1", marginBottom: 8 }}>Additional Contacts</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
+                  {companyProfile.additionalContacts.map((contact, idx) => (
+                    <div key={idx} style={{ background: "#f8fafc", borderRadius: 8, padding: 16, border: "1px solid #e2e8f0", minWidth: 120, flex: 1 }}>
+                      {Object.entries(contact).map(([key, value]) => (
+                        <div key={key} style={{ color: "#374151", fontSize: "1rem", marginBottom: 4 }}>
+                          <span style={{ fontWeight: 600 }}>{key.charAt(0).toUpperCase() + key.slice(1)}:</span> {value || "-"}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Documents */}
+          <div style={{ backgroundColor: "white", borderRadius: "16px", padding: "2rem", border: "1px solid #e5e7eb", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", marginBottom: "2rem" }}>
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#1f2937", marginBottom: "1.5rem", margin: 0 }}>Company Documents</h2>
+            {companyProfile.documents && companyProfile.documents.length > 0 ? (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem" }}>
+                {companyProfile.documents.map((doc, idx) => {
+                  const file = doc.file;
+                  let thumbnail = null;
+                  if (file && file.data && file.data.data && file.mimetype && file.mimetype.startsWith('image/')) {
+                    const base64 = uint8ToBase64(new Uint8Array(file.data.data));
+                    thumbnail = (
+                      <img
+                        src={`data:${file.mimetype};base64,${base64}`}
+                        alt={file.originalName || doc.name}
+                        style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #e2e8f0', objectFit: 'cover', marginRight: 16 }}
+                      />
+                    );
+                  }
+                  return (
+                    <div key={idx} style={{ background: "#f8fafc", borderRadius: 8, padding: 16, border: "1px solid #e2e8f0", minWidth: 220, flex: 1, display: 'flex', alignItems: 'center', gap: 16 }}>
+                      {thumbnail || (
+                        <div style={{ width: 64, height: 64, background: "#eef2ff", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#4f46e5" }}>
+                          <InsertDriveFileIcon style={{ fontSize: 32 }} />
+                        </div>
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, color: "#1e293b", marginBottom: 4 }}>{doc.name || file?.originalName || 'Document'}</div>
+                        <div style={{ fontSize: 12, color: '#6366f1', marginBottom: 4 }}>{doc.status || '-'}</div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button
+                            style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', fontWeight: 600, fontSize: 14, padding: 0 }}
+                            onClick={() => {
+                              const blob = new Blob([new Uint8Array(file.data.data)], { type: file.mimetype })
+                              const url = URL.createObjectURL(blob)
+                              window.open(url, "_blank")
+                            }}
+                          >View</button>
+                          <button
+                            style={{ background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', fontWeight: 600, fontSize: 14, padding: 0 }}
+                            onClick={() => {
+                              const blob = new Blob([new Uint8Array(file.data.data)], { type: file.mimetype })
+                              const url = URL.createObjectURL(blob)
+                              const a = document.createElement("a")
+                              a.href = url
+                              a.download = file.originalName || doc.name
+                              a.click()
+                              setTimeout(() => URL.revokeObjectURL(url), 1000)
+                            }}
+                          >Download</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{ background: '#f8fafc', borderRadius: 8, padding: 24, textAlign: 'center', color: '#64748b' }}>
+                No documents have been uploaded yet.
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+      {/* Footer */}
+      <footer style={{ backgroundColor: "#1f2937", color: "white", padding: "3rem 0 1.5rem", marginTop: "3rem" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}>
+          <div style={{ borderTop: "1px solid #374151", paddingTop: "2rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <p style={{ fontSize: "0.95rem", color: "#9ca3af", margin: 0 }}>© {new Date().getFullYear()} Talent on Cloud. All rights reserved.</p>
+            <div style={{ display: "flex", gap: "2rem", fontSize: "0.9rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+              {['Privacy', 'Terms', 'Cookies', 'Sitemap'].map((item, index) => (
+                <a key={index} href="#" style={{ color: "#9ca3af", textDecoration: "none", transition: "color 0.2s ease" }} onMouseEnter={e => e.target.style.color = "#6366f1"} onMouseLeave={e => e.target.style.color = "#9ca3af"}>{item}</a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
 }
-
-export default CompanyProfile

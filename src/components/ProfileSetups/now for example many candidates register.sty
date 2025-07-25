@@ -1,0 +1,11 @@
+now for example many candidates register then it will be difficult to fetch a specific profile
+I will provide a workflow just try to implement it 
+After succes signup navigate to profile setup page then after success profile page completion navigate to login page the after success login then navigate to the candidate profile page but 
+1. after signup create a bucket with a unique id in the mongodb database which will hold the signup/login credentials and that candidates profile details
+2. after login fetch the bucket and then fetch the candidate profile details from the bucket
+3. if the candidate profile details is not found then navigate to the Signup page
+4. if the candidate profile details is found then navigate to the candidate profile page of that respective candidate
+
+Signup->profilesetup->login->candidateprofile
+so there will be multiple candidates signing up and creating profiles, for every signup create a bucket with a unique id in the mongodb database which will hold the signup/login credentials and that candidates profile details
+and when the candidate login then find the bucket id and then fetch the candidate profile details from the bucket of that respective candidate

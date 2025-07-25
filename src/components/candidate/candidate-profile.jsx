@@ -20,13 +20,27 @@ import {
     Building,
     GraduationCap,
     Code,
+    User,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import Tooltip from '@mui/material/Tooltip';
 
 export default function CandidateProfile() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isMobile, setIsMobile] = useState(false)
     const [activeTab, setActiveTab] = useState("overview")
+    const [profileData, setProfileData] = useState(null)
+    const [loading, setLoading] = useState(true)
+    // Add a state to store the profile's MongoDB _id and resume info
+    const [profileId, setProfileId] = useState(null);
+    const [resumeAvailable, setResumeAvailable] = useState(false);
+    const [resumeName, setResumeName] = useState('Resume');
+    // Add a state for download error
+    const [downloadError, setDownloadError] = useState('');
+    // Add a state for userId
+    const [userId, setUserId] = useState(localStorage.getItem('userId'));
+    // Add a state for userProfileResumeAvailable
+    const [userProfileResumeAvailable, setUserProfileResumeAvailable] = useState(false);
 
     const navigate = useNavigate();
 
@@ -44,134 +58,207 @@ export default function CandidateProfile() {
         return () => window.removeEventListener("resize", handleResize)
     }, [])
 
+    // Fetch the candidate profile for the logged-in user on mount
+    useEffect(() => {
+        setLoading(true);
+        const userId = localStorage.getItem('userId');
+        setUserId(userId);
+        if (!userId) {
+            setProfileData(null);
+            setProfileId(null);
+            setResumeAvailable(false);
+            setUserProfileResumeAvailable(false);
+            setLoading(false);
+            return;
+        }
+        fetch(`https://toc-bac-1.onrender.com/api/candidate-profile/user/${userId}`)
+            .then(res => {
+                if (!res.ok) throw new Error('No candidate profile');
+                return res.json();
+            })
+            .then(profile => {
+                setProfileId(profile._id);
+                setResumeAvailable(!!(profile.personalInfo && profile.personalInfo.resume && profile.personalInfo.resume.path));
+                setUserProfileResumeAvailable(false);
+                setResumeName(profile.personalInfo && profile.personalInfo.resume && profile.personalInfo.resume.originalName ? profile.personalInfo.resume.originalName : 'Resume');
+                setProfileData(mapProfileData(profile));
+                setLoading(false);
+            })
+            .catch(() => {
+                // Fallback: fetch from User document
+                fetch(`https://toc-bac-1.onrender.com/api/user/${userId}/profile`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('No user profile');
+                        return res.json();
+                    })
+                    .then(data => {
+                        if (data && data.profile) {
+                            setProfileId(null); // No CandidateProfile _id
+                            const hasResume = !!(data.profile.personalInfo && data.profile.personalInfo.resume && data.profile.personalInfo.resume.path);
+                            setResumeAvailable(false);
+                            setUserProfileResumeAvailable(hasResume);
+                            setResumeName(data.profile.personalInfo && data.profile.personalInfo.resume && data.profile.personalInfo.resume.originalName ? data.profile.personalInfo.resume.originalName : 'Resume');
+                            // Pass profilePhoto explicitly if present
+                            const mapped = mapProfileData(data.profile);
+                            if (data.profile.personalInfo && data.profile.personalInfo.profilePhoto) {
+                                mapped.profilePhoto = data.profile.personalInfo.profilePhoto;
+                            }
+                            setProfileData(mapped);
+                        } else {
+                            setProfileData(null);
+                            setUserProfileResumeAvailable(false);
+                        }
+                        setLoading(false);
+                    })
+                    .catch(() => {
+                        setProfileData(null);
+                        setProfileId(null);
+                        setResumeAvailable(false);
+                        setUserProfileResumeAvailable(false);
+                        setLoading(false);
+                    });
+            });
+    }, []);
+
+    // Helper: map backend profile to frontend structure
+    function mapProfileData(data) {
+        if (!data) return null;
+        // Personal Info
+        const pi = data.personalInfo || {};
+        // Skills: backend is array of strings
+        const skills = Array.isArray(data.skills)
+            ? data.skills.map(s => ({ name: s, years: '', level: '' }))
+            : [];
+        // Experience: map backend fields to frontend
+        const experience = Array.isArray(data.experience)
+            ? data.experience.map(exp => ({
+                title: exp.jobTitle,
+                company: exp.employer,
+                location: exp.location,
+                duration: `${exp.startDate || ''}${exp.endDate ? ' - ' + exp.endDate : ''}`,
+                type: exp.employmentType,
+                description: exp.experienceSummary,
+                achievements: [],
+            }))
+            : [];
+        // Projects: map backend fields to frontend
+        const projects = Array.isArray(data.projects)
+            ? data.projects.map(proj => ({
+                title: proj.projectName,
+                description: proj.description,
+                technologies: proj.keySkills ? proj.keySkills.split(',').map(s => s.trim()).filter(Boolean) : [],
+                link: proj.projectUrl,
+                image: '📁',
+            }))
+            : [];
+        // Education: map backend fields
+        const education = Array.isArray(data.education)
+            ? data.education.map(edu => ({
+                degree: edu.degree,
+                field: edu.specialization,
+                school: edu.university,
+                location: edu.institution,
+                duration: `${edu.startYear || ''}${edu.endYear ? ' - ' + edu.endYear : ''}`,
+                gpa: edu.grades,
+            }))
+            : [];
+        // Certifications: not in backend, so empty
+        const certifications = [];
+        // Add introTranscript from backend if available
+        const introTranscript = pi.introTranscript || '';
+        return {
+            name: `${pi.firstName || ''} ${pi.lastName || ''}`.trim(),
+            title: pi.title || '',
+            location: pi.location || '',
+            email: pi.email || '',
+            phone: pi.mobile || '',
+            website: '',
+            linkedin: '',
+            github: '',
+            profileViews: '',
+            searchAppearances: '',
+            recruiterViews: '',
+            skills,
+            experience,
+            projects,
+            education,
+            certifications,
+            introTranscript, // <-- add to mapped profile
+            profilePhoto: pi.profilePhoto, // Add profilePhoto to the mapped data
+        };
+    }
+
+    // Utility to get the correct profile photo URL
+    function getProfilePhotoUrl(profilePhoto) {
+        if (!profilePhoto || !profilePhoto.path) return null;
+        if (profilePhoto.path.startsWith('http')) return profilePhoto.path;
+        // Normalize slashes and extract user_uploads path
+        const normPath = profilePhoto.path.replace(/\\/g, '/');
+        const idx = normPath.toLowerCase().indexOf('user_uploads/');
+        if (idx !== -1) {
+            return `https://toc-bac-1.onrender.com/${normPath.substring(idx)}`;
+        }
+        return `https://toc-bac-1.onrender.com/${normPath}`;
+    }
+
     const handleBrowseJobs = () => {
         navigate('/all-jobs')
     }
 
-    const profileData = {
-        name: "Jay Rutherford",
-        title: "Senior UX/UI Designer",
-        location: "San Francisco, CA",
-        experience: "5+ years",
-        email: "jay.rutherford@email.com",
-        phone: "+1 (555) 123-4567",
-        website: "www.jayrutherford.com",
-        linkedin: "linkedin.com/in/jayrutherford",
-        github: "github.com/jayrutherford",
-        profileViews: 1247,
-        searchAppearances: 89,
-        recruiterViews: 156,
-        skills: [
-            { name: "UX Research", years: 5, level: "Expert" },
-            { name: "UI Design", years: 5, level: "Expert" },
-            { name: "Figma", years: 4, level: "Advanced" },
-            { name: "Adobe XD", years: 3, level: "Advanced" },
-            { name: "Prototyping", years: 4, level: "Advanced" },
-            { name: "User Testing", years: 3, level: "Intermediate" },
-            { name: "Design Systems", years: 2, level: "Intermediate" },
-            { name: "HTML/CSS", years: 3, level: "Intermediate" },
-        ],
-        experience: [
-            {
-                title: "Senior UX/UI Designer",
-                company: "ByteDance",
-                location: "San Francisco, CA",
-                duration: "Jan 2021 - Present",
-                type: "Full-time",
-                description:
-                    "Lead design initiatives for TikTok's creator tools, improving user engagement by 40%. Manage a team of 3 junior designers and collaborate with cross-functional teams.",
-                achievements: [
-                    "Redesigned creator dashboard resulting in 40% increase in user engagement",
-                    "Led design system implementation across 5 product teams",
-                    "Mentored 3 junior designers and established design review processes",
-                ],
-            },
-            {
-                title: "UX/UI Designer",
-                company: "ConocoPhillips",
-                location: "Houston, TX",
-                duration: "Aug 2018 - Dec 2020",
-                type: "Full-time",
-                description:
-                    "Designed internal tools and dashboards for energy sector operations, focusing on data visualization and workflow optimization.",
-                achievements: [
-                    "Improved operational efficiency by 25% through dashboard redesign",
-                    "Conducted user research with 50+ field operators",
-                    "Created comprehensive design documentation and guidelines",
-                ],
-            },
-            {
-                title: "Junior UX/UI Designer",
-                company: "Brex",
-                location: "San Francisco, CA",
-                duration: "Jun 2017 - Jul 2018",
-                type: "Full-time",
-                description: "Worked on fintech products focusing on expense management and corporate card interfaces.",
-                achievements: [
-                    "Designed onboarding flow that reduced drop-off by 30%",
-                    "Created mobile-first designs for expense tracking features",
-                    "Collaborated with engineering team on design system components",
-                ],
-            },
-        ],
-        projects: [
-            {
-                title: "Smart Finance App Redesign",
-                description:
-                    "Complete redesign of a personal finance application focusing on improved user experience, simplified navigation, and enhanced data visualization.",
-                technologies: ["Figma", "Principle", "User Research", "A/B Testing"],
-                link: "https://dribbble.com/shots/finance-app",
-                image: "💰",
-            },
-            {
-                title: "EcoRide Bike Sharing Platform",
-                description:
-                    "End-to-end design of a bike sharing platform including mobile app, web dashboard, and IoT device interfaces.",
-                technologies: ["Sketch", "InVision", "User Journey Mapping", "Prototyping"],
-                link: "https://behance.net/gallery/ecoride",
-                image: "🚲",
-            },
-            {
-                title: "Healthcare Dashboard System",
-                description:
-                    "Complex data visualization dashboard for healthcare professionals to monitor patient metrics and treatment outcomes.",
-                technologies: ["Adobe XD", "Data Visualization", "User Testing", "Accessibility"],
-                link: "https://portfolio.com/healthcare-dashboard",
-                image: "🏥",
-            },
-        ],
-        education: [
-            {
-                degree: "Master of Design",
-                field: "Human-Computer Interaction",
-                school: "Stanford University",
-                location: "Stanford, CA",
-                duration: "2015 - 2017",
-                gpa: "3.8/4.0",
-            },
-            {
-                degree: "Bachelor of Arts",
-                field: "Graphic Design",
-                school: "UC Berkeley",
-                location: "Berkeley, CA",
-                duration: "2011 - 2015",
-                gpa: "3.6/4.0",
-            },
-        ],
-        certifications: [
-            {
-                name: "Google UX Design Professional Certificate",
-                issuer: "Google",
-                date: "2023",
-                credentialId: "ABC123XYZ",
-            },
-            {
-                name: "Certified Usability Analyst (CUA)",
-                issuer: "Human Factors International",
-                date: "2022",
-                credentialId: "CUA-2022-456",
-            },
-        ],
+    const handleEndSession = () => {
+        localStorage.clear();
+        navigate("/login");
+    }
+
+    // Handler for Edit Profile button
+    const handleEditProfile = () => {
+        navigate('/candidate/profile-setup');
+    };
+
+    // Improved download handler (supports both candidate and user resume)
+    const handleResumeDownload = async (e) => {
+        e.preventDefault();
+        setDownloadError('');
+        if (!(resumeAvailable || userProfileResumeAvailable)) return;
+        try {
+            let url = '';
+            if (profileId && resumeAvailable) {
+                url = `https://toc-bac-1.onrender.com/api/candidate-profile/${profileId}/resume`;
+            } else if (userId && userProfileResumeAvailable) {
+                url = `https://toc-bac-1.onrender.com/api/user/${userId}/resume`;
+            } else {
+                setDownloadError('Resume not available.');
+                alert('Resume not available.');
+                return;
+            }
+            const response = await fetch(url, { method: 'GET' });
+            if (!response.ok) {
+                const data = await response.json();
+                setDownloadError(data.error || 'Failed to download resume.');
+                alert(data.error || 'Failed to download resume.');
+                return;
+            }
+            // Download the file as a blob
+            const blob = await response.blob();
+            const urlBlob = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = urlBlob;
+            a.download = resumeName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(urlBlob);
+        } catch {
+            setDownloadError('Error downloading resume.');
+            alert('Error downloading resume.');
+        }
+    };
+
+    if (loading) {
+        return <div style={{ textAlign: 'center', marginTop: '4rem' }}>Loading profile...</div>;
+    }
+    if (!profileData) {
+        return <div style={{ textAlign: 'center', marginTop: '4rem' }}>No profile found. Please complete your profile setup.</div>;
     }
 
     const navigationItems = [
@@ -296,25 +383,41 @@ export default function CandidateProfile() {
                                 onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
                                 onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
                             >
-                                <div
-                                    style={{
-                                        width: "32px",
-                                        height: "32px",
-                                        backgroundColor: "#6366f1",
-                                        borderRadius: "50%",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: "white",
-                                        fontSize: "0.9rem",
-                                        fontWeight: "600",
-                                    }}
-                                >
-                                    JR
-                                </div>
-                                <span style={{ fontSize: "0.9rem", fontWeight: "500", color: "#4b5563" }}>Jay Rutherford</span>
+                                {profileData.profilePhoto && profileData.profilePhoto.path ? (
+                                    <img
+                                        src={getProfilePhotoUrl(profileData.profilePhoto)}
+                                        alt="Profile"
+                                        style={{
+                                            width: "32px",
+                                            height: "32px",
+                                            borderRadius: "50%",
+                                            objectFit: "cover",
+                                            margin: 0,
+                                            border: "2px solid #e0e7ff",
+                                        }}
+                                    />
+                                ) : (
+                                    <div
+                                        style={{
+                                            width: "32px",
+                                            height: "32px",
+                                            backgroundColor: "#6366f1",
+                                            borderRadius: "50%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            color: "white",
+                                            fontSize: "0.9rem",
+                                            fontWeight: "600",
+                                        }}
+                                    >
+                                        <User size={18} />
+                                    </div>
+                                )}
+                                <span style={{ fontSize: "0.9rem", fontWeight: "500", color: "#4b5563" }}>{profileData.name}</span>
                             </div>
                             <button
+                                onClick={handleEndSession}
                                 style={{
                                     backgroundColor: "#ef4444",
                                     color: "white",
@@ -393,22 +496,37 @@ export default function CandidateProfile() {
                                     marginBottom: "0.5rem",
                                 }}
                             >
-                                <div
-                                    style={{
-                                        width: "40px",
-                                        height: "40px",
-                                        backgroundColor: "#6366f1",
-                                        borderRadius: "50%",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: "white",
-                                        fontSize: "1rem",
-                                        fontWeight: "600",
-                                    }}
-                                >
-                                    JR
-                                </div>
+                                {profileData.profilePhoto && profileData.profilePhoto.path ? (
+                                    <img
+                                        src={getProfilePhotoUrl(profileData.profilePhoto)}
+                                        alt="Profile"
+                                        style={{
+                                            width: "40px",
+                                            height: "40px",
+                                            borderRadius: "50%",
+                                            objectFit: "cover",
+                                            margin: 0,
+                                            border: "2px solid #e0e7ff",
+                                        }}
+                                    />
+                                ) : (
+                                    <div
+                                        style={{
+                                            width: "40px",
+                                            height: "40px",
+                                            backgroundColor: "#6366f1",
+                                            borderRadius: "50%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            color: "white",
+                                            fontSize: "1rem",
+                                            fontWeight: "600",
+                                        }}
+                                    >
+                                        <User size={22} />
+                                    </div>
+                                )}
                                 <div>
                                     <div style={{ fontSize: "1rem", fontWeight: "600", color: "#1f2937" }}>Jay Rutherford</div>
                                     <div style={{ fontSize: "0.85rem", color: "#6b7280" }}>Senior UX/UI Designer</div>
@@ -506,24 +624,39 @@ export default function CandidateProfile() {
                                 marginBottom: "1.5rem",
                             }}
                         >
-                            <div
-                                style={{
-                                    width: "120px",
-                                    height: "120px",
-                                    backgroundColor: "#6366f1",
-                                    borderRadius: "50%",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    color: "white",
-                                    fontSize: "2.5rem",
-                                    fontWeight: "700",
-                                    margin: "0 auto",
-                                    border: "4px solid #e0e7ff",
-                                }}
-                            >
-                                JR
-                            </div>
+                            {profileData.profilePhoto && profileData.profilePhoto.path ? (
+                                <img
+                                    src={getProfilePhotoUrl(profileData.profilePhoto)}
+                                    alt="Profile"
+                                    style={{
+                                        width: "120px",
+                                        height: "120px",
+                                        borderRadius: "50%",
+                                        objectFit: "cover",
+                                        margin: "0 auto",
+                                        border: "4px solid #e0e7ff",
+                                    }}
+                                />
+                            ) : (
+                                <div
+                                    style={{
+                                        width: "120px",
+                                        height: "120px",
+                                        backgroundColor: "#6366f1",
+                                        borderRadius: "50%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "white",
+                                        fontSize: "2.5rem",
+                                        fontWeight: "700",
+                                        margin: "0 auto",
+                                        border: "4px solid #e0e7ff",
+                                    }}
+                                >
+                                    JR
+                                </div>
+                            )}
                             <div
                                 style={{
                                     position: "absolute",
@@ -640,35 +773,39 @@ export default function CandidateProfile() {
                                 marginBottom: "1.5rem",
                             }}
                         >
+                            <Tooltip title={resumeAvailable || userProfileResumeAvailable ? '' : 'Resume not available'}>
+                                <span>
+                                    <button
+                                        onClick={handleResumeDownload}
+                                        disabled={!(resumeAvailable || userProfileResumeAvailable)}
+                                        style={{
+                                            backgroundColor: (resumeAvailable || userProfileResumeAvailable) ? "#6366f1" : "#d1d5db",
+                                            color: "white",
+                                            border: "none",
+                                            padding: "0.75rem 1rem",
+                                            borderRadius: "8px",
+                                            fontSize: "0.9rem",
+                                            fontWeight: "600",
+                                            cursor: (resumeAvailable || userProfileResumeAvailable) ? "pointer" : "not-allowed",
+                                            transition: "all 0.2s ease",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            gap: "0.5rem",
+                                            textDecoration: "none"
+                                        }}
+                                    >
+                                        <Download size={16} />
+                                        Download Resume
+                                    </button>
+                                </span>
+                            </Tooltip>
+                            {downloadError && (
+                                <div style={{ color: 'red', fontSize: '0.9rem' }}>{downloadError}</div>
+                            )}
                             <button
-                                style={{
-                                    backgroundColor: "#6366f1",
-                                    color: "white",
-                                    border: "none",
-                                    padding: "0.75rem 1rem",
-                                    borderRadius: "8px",
-                                    fontSize: "0.9rem",
-                                    fontWeight: "600",
-                                    cursor: "pointer",
-                                    transition: "all 0.2s ease",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: "0.5rem",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.backgroundColor = "#5856eb"
-                                    e.target.style.transform = "translateY(-1px)"
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.backgroundColor = "#6366f1"
-                                    e.target.style.transform = "translateY(0)"
-                                }}
-                            >
-                                <Download size={16} />
-                                Download Resume
-                            </button>
-                            <button
+                                // Edit Profile navigates to the profile setup/edit form
+                                onClick={handleEditProfile}
                                 style={{
                                     backgroundColor: "transparent",
                                     color: "#6366f1",
@@ -1006,12 +1143,15 @@ export default function CandidateProfile() {
                                         margin: 0,
                                     }}
                                 >
-                                    Jay Rutherford brings strong expertise in UX research, conducting user interviews, and testing to
-                                    uncover actionable insights that drive product decisions. With over 5 years of experience in the tech
-                                    industry, Jay has worked with leading companies to create user-centered designs that improve
-                                    engagement and conversion rates. Passionate about creating inclusive and accessible digital
-                                    experiences that make a real impact on users' lives.
+                                    About the candidate
                                 </p>
+                                {/* Video Introduction Transcript Display */}
+                                {profileData.introTranscript && (
+                                    <div style={{ marginTop: '2rem', background: '#f8fafc', borderRadius: '8px', padding: '1rem', border: '1px solid #e5e7eb' }}>
+                                        <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: '#6366f1', marginBottom: '0.5rem' }}>Video Introduction Transcript</h3>
+                                        <p style={{ fontSize: '1rem', color: '#374151', margin: 0, whiteSpace: 'pre-line' }}>{profileData.introTranscript}</p>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Recent Activity */}

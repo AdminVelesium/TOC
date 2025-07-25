@@ -22,11 +22,10 @@ const EmployerSignUp = () => {
 
     const containerStyle = {
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #8B8B8B 0%, #6B6B6B 100%)",
+        background: "#f8fafc",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "clamp(16px, 2vw, 24px)",
+        padding: 0,
+        margin: 0,
         position: "relative",
         overflow: "hidden",
         width: "100vw",
@@ -34,33 +33,52 @@ const EmployerSignUp = () => {
         boxSizing: "border-box",
     }
 
+    const leftPanelStyle = {
+        flex: 1,
+        background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+        color: "white",
+        padding: "40px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        position: "relative",
+        overflow: "hidden",
+    }
+
+    const rightPanelStyle = {
+        width: "50%",
+        minWidth: "500px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "40px",
+    }
+
     const decorativeCircle1Style = {
         position: "absolute",
-        top: "clamp(60px, 8vw, 100px)",
-        right: "clamp(60px, 8vw, 120px)",
-        width: "clamp(200px, 25vw, 350px)",
-        height: "clamp(200px, 25vw, 350px)",
-        background: "#2DD4BF",
+        top: "-100px",
+        right: "-100px",
+        width: "400px",
+        height: "400px",
+        background: "rgba(255, 255, 255, 0.1)",
         borderRadius: "50%",
-        zIndex: 1,
     }
 
     const decorativeCircle2Style = {
         position: "absolute",
-        bottom: "clamp(60px, 8vw, 100px)",
-        left: "clamp(60px, 8vw, 120px)",
-        width: "clamp(180px, 22vw, 300px)",
-        height: "clamp(180px, 22vw, 300px)",
-        background: "#2DD4BF",
+        bottom: "-150px",
+        left: "-150px",
+        width: "500px",
+        height: "500px",
+        background: "rgba(255, 255, 255, 0.05)",
         borderRadius: "50%",
-        zIndex: 1,
     }
 
     const headerStyle = {
         position: "absolute",
-        top: "clamp(20px, 3vw, 32px)",
-        left: "clamp(20px, 3vw, 32px)",
-        right: "clamp(20px, 3vw, 32px)",
+        top: "32px",
+        left: "32px",
+        right: "32px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -70,73 +88,72 @@ const EmployerSignUp = () => {
     const logoStyle = {
         display: "flex",
         alignItems: "center",
-        gap: "clamp(8px, 1vw, 12px)",
+        gap: "12px",
         color: "#fff",
-        fontSize: "clamp(18px, 2vw, 22px)",
+        fontSize: "22px",
         fontWeight: "600",
     }
 
     const logoIconStyle = {
-        width: "clamp(28px, 3vw, 32px)",
-        height: "clamp(28px, 3vw, 32px)",
+        width: "32px",
+        height: "32px",
         background: "linear-gradient(135deg, #FF6B35 0%, #F7931E 100%)",
         borderRadius: "6px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         color: "#fff",
-        fontSize: "clamp(16px, 1.8vw, 20px)",
+        fontSize: "20px",
         fontWeight: "bold",
     }
 
     const headerRightStyle = {
         display: "flex",
         alignItems: "center",
-        gap: "clamp(12px, 1.5vw, 16px)",
+        gap: "16px",
         color: "#fff",
-        fontSize: "clamp(14px, 1.2vw, 16px)",
+        fontSize: "16px",
     }
 
     const formCardStyle = {
         background: "#fff",
-        borderRadius: "clamp(12px, 1.5vw, 16px)",
-        padding: "clamp(32px, 4vw, 48px)",
+        borderRadius: "16px",
+        padding: "48px",
         width: "100%",
-        maxWidth: "clamp(400px, 45vw, 480px)",
-        boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-        zIndex: 5,
+        maxWidth: "520px",
+        boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
         position: "relative",
     }
 
     const titleStyle = {
-        fontSize: "clamp(24px, 3vw, 32px)",
+        fontSize: "28px",
         fontWeight: "700",
         color: "#1a1a1a",
         textAlign: "center",
-        marginBottom: "clamp(24px, 3vw, 32px)",
+        marginBottom: "32px",
     }
 
     const inputStyle = {
-        height: "clamp(44px, 5vw, 48px)",
-        borderRadius: "clamp(6px, 0.8vw, 8px)",
-        fontSize: "clamp(14px, 1.2vw, 16px)",
+        height: "48px",
+        borderRadius: "8px",
+        fontSize: "16px",
         border: "1px solid #e6e6e6",
         background: "#f8f9fa",
     }
 
     const buttonStyle = {
-        height: "clamp(44px, 5vw, 48px)",
-        borderRadius: "clamp(6px, 0.8vw, 8px)",
-        fontSize: "clamp(14px, 1.2vw, 16px)",
+        height: "48px",
+        borderRadius: "8px",
+        fontSize: "16px",
         fontWeight: "600",
-        background: "#667eea",
-        borderColor: "#667eea",
+        background: "#4f46e5",
+        borderColor: "#4f46e5",
         width: "100%",
     }
 
     const socialButtonStyle = {
-        width: "clamp(48px, 5vw, 52px)",
-        height: "clamp(48px, 5vw, 52px)",
+        width: "48px",
+        height: "48px",
         borderRadius: "50%",
         display: "flex",
         alignItems: "center",
@@ -145,129 +162,196 @@ const EmployerSignUp = () => {
         background: "#fff",
         cursor: "pointer",
         transition: "all 0.3s ease",
-        fontSize: "clamp(18px, 2vw, 20px)",
+        fontSize: "20px",
     }
 
     const checkboxRowStyle = {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        marginBottom: "clamp(20px, 2.5vw, 24px)",
+        marginBottom: "24px",
         flexWrap: "wrap",
-        gap: "clamp(8px, 1vw, 12px)",
+        gap: "12px",
+    }
+
+    const featureItemStyle = {
+        display: "flex",
+        alignItems: "center",
+        marginBottom: "24px",
+        padding: "16px",
+        background: "rgba(255, 255, 255, 0.1)",
+        borderRadius: "8px",
+        transition: "all 0.3s ease",
+    }
+
+    const featureIconStyle = {
+        width: "40px",
+        height: "40px",
+        background: "rgba(255, 255, 255, 0.2)",
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        marginRight: "16px",
+        flexShrink: 0,
     }
 
     const onFinish = async (values) => {
         setLoading(true)
-        // Simulate API call
-        setTimeout(() => {
-            console.log("Sign up values:", values)
-            setLoading(false)
-        }, 2000)
+        try {
+            const response = await fetch('https://toc-bac-1.onrender.com/api/auth/employer-signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(values)
+            });
+            const data = await response.json();
+            if (response.ok) {
+                if (data && data.employer && data.employer.id) {
+                    localStorage.setItem('employerId', data.employer.id);
+                }
+                navigate('/employer-profile-setup-1');
+            } else {
+                form.setFields([{
+                    name: 'email',
+                    errors: [data.message || 'Signup failed']
+                }]);
+            }
+        } catch {
+            form.setFields([{
+                name: 'email',
+                errors: ['Network error, please try again']
+            }]);
+        }
+        setLoading(false)
     }
 
     return (
         <div style={containerStyle}>
-            {/* Decorative Circles */}
-            <div style={decorativeCircle1Style} />
-            <div style={decorativeCircle2Style} />
+            {/* Left Panel - Information Section */}
+            <div style={leftPanelStyle}>
+                <div style={decorativeCircle1Style} />
+                <div style={decorativeCircle2Style} />
 
-            {/* Header */}
-            <div style={headerStyle}>
-                <div style={logoStyle}>
-                    <div style={logoIconStyle}>⚡</div>
-                    <span>Talent on Cloud</span>
-                </div>
-                <div style={headerRightStyle}>
-                    <Text style={{ color: "#fff", fontSize: "inherit" }}>Don't have an account?</Text>
-                    <Link style={{ color: "#fff", fontSize: "inherit", textDecoration: "underline" }} onClick={handlesignin}>Sign In</Link>
+                <div style={{ maxWidth: "600px", margin: "0 auto", zIndex: 2 }}>
+                    <Title level={2} style={{ color: "white", fontSize: "36px", marginBottom: "24px" }}>
+                        Find the Best Talent for Your Company
+                    </Title>
+
+                    <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "16px", marginBottom: "40px", display: "block" }}>
+                        Join thousands of employers who have found their perfect candidates through our platform.
+                    </Text>
+
+                    <div style={featureItemStyle}>
+                        <div style={featureIconStyle}>🔍</div>
+                        <div>
+                            <Text strong style={{ color: "white", display: "block", marginBottom: "4px" }}>Advanced Candidate Search</Text>
+                            <Text style={{ color: "rgba(255,255,255,0.8)" }}>Filter through thousands of profiles to find your ideal candidate</Text>
+                        </div>
+                    </div>
+
+                    <div style={featureItemStyle}>
+                        <div style={featureIconStyle}>📊</div>
+                        <div>
+                            <Text strong style={{ color: "white", display: "block", marginBottom: "4px" }}>Performance Analytics</Text>
+                            <Text style={{ color: "rgba(255,255,255,0.8)" }}>Track applicant metrics and hiring success rates</Text>
+                        </div>
+                    </div>
+
+                    <div style={featureItemStyle}>
+                        <div style={featureIconStyle}>🤝</div>
+                        <div>
+                            <Text strong style={{ color: "white", display: "block", marginBottom: "4px" }}>Dedicated Support</Text>
+                            <Text style={{ color: "rgba(255,255,255,0.8)" }}>Our team is here to help you through every step of the hiring process</Text>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Form Card */}
-            <div style={formCardStyle}>
-                <Title level={2} style={titleStyle}>
-                    Employer SignUp
-                </Title>
+            {/* Right Panel - Form Section */}
+            <div style={rightPanelStyle}>
+                <div style={formCardStyle}>
+                    <Title level={2} style={titleStyle}>
+                        Create Employer Account
+                    </Title>
 
-                <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false}>
-                    <Form.Item
-                        label={
-                            <span style={{ fontSize: "clamp(14px, 1.2vw, 16px)", fontWeight: "500", color: "#333" }}>Email</span>
-                        }
-                        name="email"
-                        rules={[
-                            { required: true, message: "Please enter your email!" },
-                            { type: "email", message: "Please enter a valid email!" },
-                        ]}
-                        style={{ marginBottom: "clamp(16px, 2vw, 20px)" }}
-                    >
-                        <Input placeholder="example.email@gmail.com" style={inputStyle} />
-                    </Form.Item>
-
-                    <Form.Item
-                        label={
-                            <span style={{ fontSize: "clamp(14px, 1.2vw, 16px)", fontWeight: "500", color: "#333" }}>Password</span>
-                        }
-                        name="password"
-                        rules={[
-                            { required: true, message: "Please enter your password!" },
-                            { min: 8, message: "Password must be at least 8 characters!" },
-                        ]}
-                        style={{ marginBottom: "clamp(16px, 2vw, 20px)" }}
-                    >
-                        <Input.Password
-                            placeholder="Enter at least 8+ characters"
-                            style={inputStyle}
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        label={
-                            <span style={{ fontSize: "clamp(14px, 1.2vw, 16px)", fontWeight: "500", color: "#333" }}>
-                                Confirm Password
-                            </span>
-                        }
-                        name="confirmPassword"
-                        dependencies={["password"]}
-                        rules={[
-                            { required: true, message: "Please confirm your password!" },
-                            ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                    if (!value || getFieldValue("password") === value) {
-                                        return Promise.resolve()
-                                    }
-                                    return Promise.reject(new Error("Passwords do not match!"))
-                                },
-                            }),
-                        ]}
-                        style={{ marginBottom: "clamp(20px, 2.5vw, 24px)" }}
-                    >
-                        <Input.Password
-                            placeholder="Enter at least 8+ characters"
-                            style={inputStyle}
-                            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                        />
-                    </Form.Item>
-                    <div style={checkboxRowStyle}>
-                        <Form.Item name="remember" valuePropName="checked" style={{ margin: 0 }}>
-                            <Checkbox style={{ fontSize: "clamp(13px, 1.1vw, 14px)", color: "#666" }}>Remember me</Checkbox>
+                    <Form form={form} layout="vertical" onFinish={onFinish} requiredMark={false}>
+                        <Form.Item
+                            label={
+                                <span style={{ fontSize: "14px", fontWeight: "500", color: "#333" }}>Email</span>
+                            }
+                            name="email"
+                            rules={[
+                                { required: true, message: "Please enter your email!" },
+                                { type: "email", message: "Please enter a valid email!" },
+                            ]}
+                            style={{ marginBottom: "20px" }}
+                        >
+                            <Input placeholder="example.email@gmail.com" style={inputStyle} />
                         </Form.Item>
-                        <Link style={{ fontSize: "clamp(13px, 1.1vw, 14px)", color: "#667eea" }}>Forgot password?</Link>
-                    </div>
 
-                    <Form.Item style={{ marginBottom: "clamp(24px, 3vw, 32px)" }}>
-                        <Button type="primary" htmlType="submit" loading={loading} style={buttonStyle} onClick={handleSignup}>
-                            Sign Up
-                        </Button>
-                    </Form.Item>
-                </Form>
-                <div style={{ textAlign: "center" }}>
-                    <Text style={{ fontSize: "clamp(13px, 1.1vw, 14px)", color: "#666", marginBottom: "clamp(16px, 2vw, 20px)", display: "block" }}>
-                        Or sign in with
-                    </Text>
-                    <Space size="large" style={{ justifyContent: "center", width: "100%" }}>
+                        <Form.Item
+                            label={
+                                <span style={{ fontSize: "14px", fontWeight: "500", color: "#333" }}>Password</span>
+                            }
+                            name="password"
+                            rules={[
+                                { required: true, message: "Please enter your password!" },
+                                { min: 8, message: "Password must be at least 8 characters!" },
+                            ]}
+                            style={{ marginBottom: "20px" }}
+                        >
+                            <Input.Password
+                                placeholder="Enter at least 8+ characters"
+                                style={inputStyle}
+                                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label={
+                                <span style={{ fontSize: "14px", fontWeight: "500", color: "#333" }}>
+                                    Confirm Password
+                                </span>
+                            }
+                            name="confirmPassword"
+                            dependencies={["password"]}
+                            rules={[
+                                { required: true, message: "Please confirm your password!" },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue("password") === value) {
+                                            return Promise.resolve()
+                                        }
+                                        return Promise.reject(new Error("Passwords do not match!"))
+                                    },
+                                }),
+                            ]}
+                            style={{ marginBottom: "24px" }}
+                        >
+                            <Input.Password
+                                placeholder="Enter at least 8+ characters"
+                                style={inputStyle}
+                                iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                            />
+                        </Form.Item>
+
+                        <div style={checkboxRowStyle}>
+                            <Form.Item name="remember" valuePropName="checked" style={{ margin: 0 }}>
+                                <Checkbox style={{ fontSize: "14px", color: "#666" }}>Remember me</Checkbox>
+                            </Form.Item>
+                            <Link style={{ fontSize: "14px", color: "#4f46e5" }}>Forgot password?</Link>
+                        </div>
+
+                        <Form.Item style={{ marginBottom: "32px" }}>
+                            <Button type="primary" htmlType="submit" loading={loading} style={buttonStyle} onClick={handleSignup}>
+                                Sign Up
+                            </Button>
+                        </Form.Item>
+                    </Form>
+
+                    <Divider style={{ fontSize: "14px", color: "#999" }}>Or sign up with</Divider>
+
+                    <Space size="large" style={{ justifyContent: "center", width: "100%", marginBottom: "24px" }}>
                         <div
                             style={{ ...socialButtonStyle, color: "#db4437" }}
                             onMouseEnter={(e) => {
@@ -308,10 +392,15 @@ const EmployerSignUp = () => {
                             <AppleOutlined />
                         </div>
                     </Space>
+
+                    <div style={{ textAlign: "center", marginTop: "24px" }}>
+                        <Text style={{ color: "#666", marginRight: "8px" }}>Already have an account?</Text>
+                        <Link onClick={handlesignin} style={{ color: "#4f46e5", fontWeight: "500" }}>Sign In</Link>
+                    </div>
                 </div>
             </div>
-            {/* Footer */}
-        </div >
+        </div>
     )
 }
+
 export default EmployerSignUp

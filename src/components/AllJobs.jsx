@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Logo from "./Logo"
 import {
     Menu,
     X,
@@ -23,6 +24,13 @@ import {
     CheckCircle,
 } from "lucide-react"
 
+// Helper to map backend candidate profile to name
+function extractCandidateName(data) {
+    if (!data) return '';
+    const pi = data.personalInfo || {};
+    return `${pi.firstName || ''} ${pi.lastName || ''}`.trim() || pi.email || 'User';
+}
+
 export default function AllJobs() {
     const [isMobile, setIsMobile] = useState(false)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -31,6 +39,36 @@ export default function AllJobs() {
     const [selectedJob, setSelectedJob] = useState(null)
     const [bookmarkedJobs, setBookmarkedJobs] = useState([])
     const [activeFilter, setActiveFilter] = useState("all")
+    const [jobs, setJobs] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    // State for candidate name
+    const [candidateName, setCandidateName] = useState('');
+    const [candidateLoading, setCandidateLoading] = useState(true);
+
+    // Fetch candidate name on mount
+    useEffect(() => {
+        setCandidateLoading(true);
+        fetch('https://toc-bac-1.onrender.com/api/candidate-profile')
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch candidate profile');
+                return res.json();
+            })
+            .then(data => {
+                if (Array.isArray(data) && data.length > 0) {
+                    const latest = data[data.length - 1];
+                    setCandidateName(extractCandidateName(latest));
+                } else {
+                    setCandidateName('User');
+                }
+                setCandidateLoading(false);
+            })
+            .catch(() => {
+                setCandidateName('User');
+                setCandidateLoading(false);
+            });
+    }, []);
 
     // Handle responsive behavior
     useEffect(() => {
@@ -45,222 +83,73 @@ export default function AllJobs() {
         return () => window.removeEventListener("resize", handleResize)
     }, [])
 
-    // Sample jobs data
-    const jobs = [
-        {
-            id: "1",
-            title: "Senior Software Engineer",
-            company: "TechCorp Solutions",
-            companyLogo: "/placeholder.svg?height=60&width=60",
-            location: "Bangalore, India",
-            workType: "Full-time",
-            workMode: "Hybrid",
-            salary: "₹15-25 LPA",
-            experience: "4-7 years",
-            postedDate: "2 days ago",
-            applicants: 45,
-            description:
-                "We are looking for a Senior Software Engineer to join our dynamic team. You will be responsible for designing, developing, and maintaining scalable web applications using modern technologies.",
-            requirements: [
-                "Bachelor's degree in Computer Science or related field",
-                "4+ years of experience in software development",
-                "Proficiency in React, Node.js, and TypeScript",
-                "Experience with cloud platforms (AWS/Azure)",
-                "Strong problem-solving and communication skills",
-            ],
-            skills: ["React", "Node.js", "TypeScript", "AWS", "MongoDB", "Docker"],
-            benefits: [
-                "Health Insurance",
-                "Flexible Working Hours",
-                "Learning & Development",
-                "Performance Bonus",
-                "Work from Home",
-            ],
-            companySize: "500-1000 employees",
-            industry: "Technology",
-            rating: 4.2,
-            reviews: 156,
-            isUrgent: false,
-            isFeatured: true,
-            applicationDeadline: "15 Dec 2024",
-        },
-        {
-            id: "2",
-            title: "Product Manager",
-            company: "Innovate Labs",
-            companyLogo: "/placeholder.svg?height=60&width=60",
-            location: "Mumbai, India",
-            workType: "Full-time",
-            workMode: "Remote",
-            salary: "₹20-30 LPA",
-            experience: "5-8 years",
-            postedDate: "1 day ago",
-            applicants: 32,
-            description:
-                "Join our product team to drive innovation and strategy. You'll work closely with engineering, design, and business teams to deliver exceptional products that delight our customers.",
-            requirements: [
-                "MBA or equivalent experience in product management",
-                "5+ years of product management experience",
-                "Experience with Agile methodologies",
-                "Strong analytical and data-driven mindset",
-                "Excellent communication and leadership skills",
-            ],
-            skills: ["Product Strategy", "Agile", "Analytics", "Roadmapping", "Jira", "Figma"],
-            benefits: [
-                "Stock Options",
-                "Health Insurance",
-                "Flexible PTO",
-                "Remote Work",
-                "Learning Budget",
-                "Gym Membership",
-            ],
-            companySize: "200-500 employees",
-            industry: "Fintech",
-            rating: 4.5,
-            reviews: 89,
-            isUrgent: true,
-            isFeatured: false,
-            applicationDeadline: "20 Dec 2024",
-        },
-        {
-            id: "3",
-            title: "Data Scientist",
-            company: "DataTech Analytics",
-            companyLogo: "/placeholder.svg?height=60&width=60",
-            location: "Hyderabad, India",
-            workType: "Full-time",
-            workMode: "On-site",
-            salary: "₹18-28 LPA",
-            experience: "3-6 years",
-            postedDate: "3 days ago",
-            applicants: 67,
-            description:
-                "We're seeking a talented Data Scientist to join our analytics team. You'll work on cutting-edge machine learning projects and help drive data-driven decision making across the organization.",
-            requirements: [
-                "Master's degree in Data Science, Statistics, or related field",
-                "3+ years of experience in data science",
-                "Proficiency in Python, R, and SQL",
-                "Experience with machine learning frameworks",
-                "Strong statistical analysis skills",
-            ],
-            skills: ["Python", "R", "SQL", "Machine Learning", "TensorFlow", "Tableau", "Statistics"],
-            benefits: ["Health Insurance", "Research Budget", "Conference Attendance", "Flexible Hours", "Meal Allowance"],
-            companySize: "1000+ employees",
-            industry: "Analytics",
-            rating: 4.1,
-            reviews: 234,
-            isUrgent: false,
-            isFeatured: true,
-            applicationDeadline: "25 Dec 2024",
-        },
-        {
-            id: "4",
-            title: "UX/UI Designer",
-            company: "Creative Studio X",
-            companyLogo: "/placeholder.svg?height=60&width=60",
-            location: "Pune, India",
-            workType: "Full-time",
-            workMode: "Hybrid",
-            salary: "₹12-18 LPA",
-            experience: "2-5 years",
-            postedDate: "4 days ago",
-            applicants: 28,
-            description:
-                "Join our design team to create beautiful and intuitive user experiences. You'll work on diverse projects ranging from web applications to mobile apps, collaborating with product and engineering teams.",
-            requirements: [
-                "Bachelor's degree in Design or related field",
-                "2+ years of UX/UI design experience",
-                "Proficiency in Figma, Sketch, and Adobe Creative Suite",
-                "Strong portfolio demonstrating design thinking",
-                "Understanding of user-centered design principles",
-            ],
-            skills: ["Figma", "Sketch", "Adobe XD", "Prototyping", "User Research", "Wireframing"],
-            benefits: ["Creative Freedom", "Design Tools Budget", "Health Insurance", "Flexible Hours", "Team Outings"],
-            companySize: "50-200 employees",
-            industry: "Design Agency",
-            rating: 4.3,
-            reviews: 67,
-            isUrgent: false,
-            isFeatured: false,
-            applicationDeadline: "30 Dec 2024",
-        },
-        {
-            id: "5",
-            title: "DevOps Engineer",
-            company: "CloudBridge Solutions",
-            companyLogo: "/placeholder.svg?height=60&width=60",
-            location: "Chennai, India",
-            workType: "Full-time",
-            workMode: "Remote",
-            salary: "₹16-24 LPA",
-            experience: "3-6 years",
-            postedDate: "5 days ago",
-            applicants: 41,
-            description:
-                "We're looking for a DevOps Engineer to help us scale our infrastructure and improve our deployment processes. You'll work with cutting-edge cloud technologies and automation tools.",
-            requirements: [
-                "Bachelor's degree in Computer Science or related field",
-                "3+ years of DevOps experience",
-                "Experience with AWS/Azure and Kubernetes",
-                "Proficiency in CI/CD tools and automation",
-                "Strong scripting skills (Python, Bash)",
-            ],
-            skills: ["AWS", "Kubernetes", "Docker", "Jenkins", "Terraform", "Python", "Monitoring"],
-            benefits: ["Cloud Certifications", "Health Insurance", "Remote Work", "Learning Budget", "Performance Bonus"],
-            companySize: "500-1000 employees",
-            industry: "Cloud Services",
-            rating: 4.4,
-            reviews: 123,
-            isUrgent: true,
-            isFeatured: true,
-            applicationDeadline: "18 Dec 2024",
-        },
-        {
-            id: "6",
-            title: "Marketing Manager",
-            company: "BrandBoost Agency",
-            companyLogo: "/placeholder.svg?height=60&width=60",
-            location: "Delhi, India",
-            workType: "Full-time",
-            workMode: "Hybrid",
-            salary: "₹14-20 LPA",
-            experience: "4-7 years",
-            postedDate: "1 week ago",
-            applicants: 52,
-            description:
-                "Lead our marketing initiatives and drive brand growth. You'll develop and execute comprehensive marketing strategies across digital and traditional channels.",
-            requirements: [
-                "MBA in Marketing or equivalent experience",
-                "4+ years of marketing experience",
-                "Experience with digital marketing and analytics",
-                "Strong project management skills",
-                "Creative thinking and strategic mindset",
-            ],
-            skills: ["Digital Marketing", "SEO", "Content Strategy", "Analytics", "Social Media", "PPC"],
-            benefits: ["Marketing Budget", "Health Insurance", "Flexible Hours", "Team Events", "Professional Development"],
-            companySize: "100-500 employees",
-            industry: "Marketing",
-            rating: 4.0,
-            reviews: 78,
-            isUrgent: false,
-            isFeatured: false,
-            applicationDeadline: "22 Dec 2024",
-        },
-    ]
-
+    // Fetch jobs from backend (job.js via /jobposting/jobs-alt)
+    useEffect(() => {
+        setLoading(true);
+        fetch('https://toc-bac-1.onrender.com/api/jobs/alljobs')
+            .then((res) => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
+            .then((data) => {
+                console.log('Fetched jobs from backend:', data);
+                if (!Array.isArray(data)) {
+                    setError('Jobs API did not return an array.');
+                    setJobs([]);
+                } else if (data.length === 0) {
+                    setError('No jobs found.');
+                    setJobs([]);
+                } else {
+                    setJobs(
+                        data.map(job => ({
+                            id: job.id || job._id,
+                            title: job.title || job.jobTitle,
+                            company: job.company || job.companyName,
+                            companyLogo: job.companyLogo || "/placeholder.svg?height=60&width=60",
+                            location: job.location,
+                            workType: job.workType || "Full-time",
+                            workMode: job.workMode || "On-site",
+                            salary: job.salary || "Not specified",
+                            experience: job.experience || job.experienceLevel || "2+ years",
+                            postedDate: job.postedDate || "",
+                            applicants: job.applicants || 0,
+                            description: job.description || "",
+                            requirements: Array.isArray(job.requirements) ? job.requirements : [],
+                            skills: Array.isArray(job.skills) ? job.skills : [],
+                            benefits: Array.isArray(job.benefits) ? job.benefits : [],
+                            companySize: job.companySize || "51-200",
+                            industry: job.industry || "Technology",
+                            rating: job.rating || 4.2,
+                            reviews: job.reviews || 50,
+                            isUrgent: !!job.isUrgent,
+                            isFeatured: !!job.isFeatured,
+                            applicationDeadline: job.applicationDeadline || "",
+                        }))
+                    );
+                    setError(null);
+                }
+                setLoading(false);
+            })
+            .catch((err) => {
+                setError(err.message);
+                setJobs([]);
+                setLoading(false);
+            });
+    }, []);
+    // Update jobCategories to use jobs from state
     const jobCategories = [
         { id: "all", name: "All Jobs", count: jobs.length },
-        { id: "technology", name: "Technology", count: 3 },
-        { id: "design", name: "Design", count: 1 },
-        { id: "marketing", name: "Marketing", count: 1 },
-        { id: "analytics", name: "Analytics", count: 1 },
+        { id: "technology", name: "Technology", count: jobs.filter(j => j.industry === "Technology").length },
+        { id: "design", name: "Design", count: jobs.filter(j => j.industry === "Design Agency").length },
+        { id: "marketing", name: "Marketing", count: jobs.filter(j => j.industry === "Marketing").length },
+        { id: "analytics", name: "Analytics", count: jobs.filter(j => j.industry === "Analytics").length },
     ]
 
     const filteredJobs = jobs.filter((job) => {
         const matchesSearch =
             job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            job.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase()))
+            (job.skills && job.skills.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase())))
 
         const matchesLocation = locationFilter === "" || job.location.toLowerCase().includes(locationFilter.toLowerCase())
 
@@ -304,6 +193,7 @@ export default function AllJobs() {
                     top: 0,
                     zIndex: 1000,
                     boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                    height: "110px",
                 }}
             >
                 <div
@@ -318,27 +208,7 @@ export default function AllJobs() {
                     }}
                 >
                     {/* Logo */}
-                    <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "0.5rem",
-                            cursor: "pointer",
-                        }}
-                    >
-                        <div
-                        >
-                        </div>
-                        <div
-                            style={{
-                                fontSize: isMobile ? "1.25rem" : "1.5rem",
-                                fontWeight: "700",
-                                color: "#1f2937",
-                            }}
-                        >
-                            Talent on <span style={{ color: "#7C7FF3" }}>Cloud</span>
-                        </div>
-                    </div>
+                    <Logo />
 
                     {/* Desktop Navigation */}
                     {!isMobile && (
@@ -486,7 +356,9 @@ export default function AllJobs() {
                             </div>
                             {!isMobile && (
                                 <>
-                                    <span style={{ fontSize: "0.9rem", fontWeight: "500", color: "#4b5563" }}>John Doe</span>
+                                    <span style={{ fontSize: "0.9rem", fontWeight: "500", color: "#4b5563" }}>
+                                        {candidateLoading ? '...' : candidateName}
+                                    </span>
                                     <ChevronDown size={16} color="#6b7280" />
                                 </>
                             )}
@@ -686,7 +558,6 @@ export default function AllJobs() {
                                 }}
                             />
                         </div>
-
                         <div
                             style={{
                                 position: "relative",
@@ -1003,345 +874,353 @@ export default function AllJobs() {
                             gap: "1.5rem",
                         }}
                     >
-                        {filteredJobs.map((job) => (
-                            <div
-                                key={job.id}
-                                onClick={() => handleJobClick(job)}
-                                style={{
-                                    backgroundColor: "white",
-                                    borderRadius: "12px",
-                                    padding: "1.5rem",
-                                    border: "1px solid #e5e7eb",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                                    cursor: "pointer",
-                                    transition: "all 0.3s ease",
-                                    position: "relative",
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.target.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"
-                                    e.target.style.transform = "translateY(-2px)"
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)"
-                                    e.target.style.transform = "translateY(0)"
-                                }}
-                            >
-                                {/* Job Badges */}
+                        {loading ? (
+                            <div style={{ textAlign: 'center', margin: '2rem 0' }}>Loading jobs...</div>
+                        ) : error ? (
+                            <div style={{ textAlign: 'center', color: 'red', margin: '2rem 0' }}>{error}</div>
+                        ) : filteredJobs.length === 0 ? (
+                            <div style={{ textAlign: 'center', margin: '2rem 0' }}>No jobs available.</div>
+                        ) : (
+                            filteredJobs.map((job) => (
                                 <div
+                                    key={job.id}
+                                    onClick={() => handleJobClick(job)}
                                     style={{
-                                        position: "absolute",
-                                        top: "1rem",
-                                        right: "1rem",
-                                        display: "flex",
-                                        gap: "0.5rem",
+                                        backgroundColor: "white",
+                                        borderRadius: "12px",
+                                        padding: "1.5rem",
+                                        border: "1px solid #e5e7eb",
+                                        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                                        cursor: "pointer",
+                                        transition: "all 0.3s ease",
+                                        position: "relative",
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)"
+                                        e.target.style.transform = "translateY(-2px)"
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)"
+                                        e.target.style.transform = "translateY(0)"
                                     }}
                                 >
-                                    {job.isUrgent && (
-                                        <span
-                                            style={{
-                                                backgroundColor: "#fef3c7",
-                                                color: "#d97706",
-                                                padding: "0.25rem 0.5rem",
-                                                borderRadius: "12px",
-                                                fontSize: "0.75rem",
-                                                fontWeight: "600",
-                                                border: "1px solid #fbbf24",
-                                            }}
-                                        >
-                                            Urgent
-                                        </span>
-                                    )}
-                                    {job.isFeatured && (
-                                        <span
-                                            style={{
-                                                backgroundColor: "#dbeafe",
-                                                color: "#2563eb",
-                                                padding: "0.25rem 0.5rem",
-                                                borderRadius: "12px",
-                                                fontSize: "0.75rem",
-                                                fontWeight: "600",
-                                                border: "1px solid #93c5fd",
-                                            }}
-                                        >
-                                            Featured
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Job Header */}
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "flex-start",
-                                        gap: "1rem",
-                                        marginBottom: "1rem",
-                                        paddingRight: "6rem",
-                                    }}
-                                >
-                                    <img
-                                        src={job.companyLogo || "/placeholder.svg"}
-                                        alt={job.company}
+                                    {/* Job Badges */}
+                                    <div
                                         style={{
-                                            width: "60px",
-                                            height: "60px",
-                                            borderRadius: "8px",
-                                            objectFit: "cover",
-                                            border: "1px solid #e5e7eb",
+                                            position: "absolute",
+                                            top: "1rem",
+                                            right: "1rem",
+                                            display: "flex",
+                                            gap: "0.5rem",
                                         }}
-                                    />
-                                    <div style={{ flex: 1 }}>
-                                        <h3
+                                    >
+                                        {job.isUrgent && (
+                                            <span
+                                                style={{
+                                                    backgroundColor: "#fef3c7",
+                                                    color: "#d97706",
+                                                    padding: "0.25rem 0.5rem",
+                                                    borderRadius: "12px",
+                                                    fontSize: "0.75rem",
+                                                    fontWeight: "600",
+                                                    border: "1px solid #fbbf24",
+                                                }}
+                                            >
+                                                Urgent
+                                            </span>
+                                        )}
+                                        {job.isFeatured && (
+                                            <span
+                                                style={{
+                                                    backgroundColor: "#dbeafe",
+                                                    color: "#2563eb",
+                                                    padding: "0.25rem 0.5rem",
+                                                    borderRadius: "12px",
+                                                    fontSize: "0.75rem",
+                                                    fontWeight: "600",
+                                                    border: "1px solid #93c5fd",
+                                                }}
+                                            >
+                                                Featured
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Job Header */}
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "flex-start",
+                                            gap: "1rem",
+                                            marginBottom: "1rem",
+                                            paddingRight: "6rem",
+                                        }}
+                                    >
+                                        <img
+                                            src={job.companyLogo}
+                                            alt={job.company}
                                             style={{
-                                                fontSize: "1.25rem",
-                                                fontWeight: "700",
-                                                color: "#1f2937",
-                                                marginBottom: "0.5rem",
-                                                lineHeight: "1.3",
+                                                width: "60px",
+                                                height: "60px",
+                                                borderRadius: "8px",
+                                                objectFit: "cover",
+                                                border: "1px solid #e5e7eb",
+                                            }}
+                                        />
+                                        <div style={{ flex: 1 }}>
+                                            <h3
+                                                style={{
+                                                    fontSize: "1.25rem",
+                                                    fontWeight: "700",
+                                                    color: "#1f2937",
+                                                    marginBottom: "0.5rem",
+                                                    lineHeight: "1.3",
+                                                }}
+                                            >
+                                                {job.title}
+                                            </h3>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.5rem",
+                                                    marginBottom: "0.5rem",
+                                                }}
+                                            >
+                                                <span
+                                                    style={{
+                                                        fontSize: "1.1rem",
+                                                        fontWeight: "600",
+                                                        color: "#3b82f6",
+                                                    }}
+                                                >
+                                                    {job.company}
+                                                </span>
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: "0.25rem",
+                                                    }}
+                                                >
+                                                    <Star size={14} color="#fbbf24" fill="#fbbf24" />
+                                                    <span style={{ fontSize: "0.9rem", color: "#6b7280" }}>
+                                                        {job.rating} ({job.reviews} reviews)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "1rem",
+                                                    flexWrap: "wrap",
+                                                    fontSize: "0.9rem",
+                                                    color: "#6b7280",
+                                                }}
+                                            >
+                                                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                                                    <MapPin size={14} />
+                                                    {job.location}
+                                                </div>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                                                    <Briefcase size={14} />
+                                                    {job.experience}
+                                                </div>
+                                                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                                                    <Clock size={14} />
+                                                    {job.workType} • {job.workMode}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Job Description */}
+                                    <p
+                                        style={{
+                                            fontSize: "0.95rem",
+                                            color: "#4b5563",
+                                            lineHeight: "1.6",
+                                            marginBottom: "1rem",
+                                        }}
+                                    >
+                                        {job.description}
+                                    </p>
+
+                                    {/* Skills */}
+                                    <div style={{ marginBottom: "1rem" }}>
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexWrap: "wrap",
+                                                gap: "0.5rem",
                                             }}
                                         >
-                                            {job.title}
-                                        </h3>
+                                            {Array.isArray(job.skills) ? job.skills.slice(0, 6).map((skill, index) => (
+                                                <span
+                                                    key={index}
+                                                    style={{
+                                                        padding: "0.25rem 0.75rem",
+                                                        backgroundColor: "#f0f9ff",
+                                                        color: "#0369a1",
+                                                        borderRadius: "12px",
+                                                        fontSize: "0.8rem",
+                                                        fontWeight: "500",
+                                                        border: "1px solid #e0f2fe",
+                                                    }}
+                                                >
+                                                    {skill}
+                                                </span>
+                                            )) : null}
+                                            {Array.isArray(job.skills) && job.skills.length > 6 && (
+                                                <span
+                                                    style={{
+                                                        padding: "0.25rem 0.75rem",
+                                                        backgroundColor: "#f3f4f6",
+                                                        color: "#6b7280",
+                                                        borderRadius: "12px",
+                                                        fontSize: "0.8rem",
+                                                        fontWeight: "500",
+                                                    }}
+                                                >
+                                                    +{job.skills.length - 6} more
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Job Footer */}
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "space-between",
+                                            paddingTop: "1rem",
+                                            borderTop: "1px solid #f3f4f6",
+                                            flexDirection: isMobile ? "column" : "row",
+                                            gap: isMobile ? "1rem" : "0",
+                                        }}
+                                    >
                                         <div
                                             style={{
                                                 display: "flex",
                                                 alignItems: "center",
-                                                gap: "0.5rem",
-                                                marginBottom: "0.5rem",
+                                                gap: "1.5rem",
+                                                flexWrap: "wrap",
                                             }}
                                         >
-                                            <span
-                                                style={{
-                                                    fontSize: "1.1rem",
-                                                    fontWeight: "600",
-                                                    color: "#3b82f6",
-                                                }}
-                                            >
-                                                {job.company}
-                                            </span>
                                             <div
                                                 style={{
                                                     display: "flex",
                                                     alignItems: "center",
                                                     gap: "0.25rem",
+                                                    fontSize: "1rem",
+                                                    fontWeight: "600",
+                                                    color: "#059669",
                                                 }}
                                             >
-                                                <Star size={14} color="#fbbf24" fill="#fbbf24" />
-                                                <span style={{ fontSize: "0.9rem", color: "#6b7280" }}>
-                                                    {job.rating} ({job.reviews} reviews)
-                                                </span>
+                                                <DollarSign size={16} />
+                                                {job.salary.replace('$', '₹')}
                                             </div>
-                                        </div>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "1rem",
-                                                flexWrap: "wrap",
-                                                fontSize: "0.9rem",
-                                                color: "#6b7280",
-                                            }}
-                                        >
-                                            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                                                <MapPin size={14} />
-                                                {job.location}
-                                            </div>
-                                            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                                                <Briefcase size={14} />
-                                                {job.experience}
-                                            </div>
-                                            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                                                <Clock size={14} />
-                                                {job.workType} • {job.workMode}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Job Description */}
-                                <p
-                                    style={{
-                                        fontSize: "0.95rem",
-                                        color: "#4b5563",
-                                        lineHeight: "1.6",
-                                        marginBottom: "1rem",
-                                    }}
-                                >
-                                    {job.description}
-                                </p>
-
-                                {/* Skills */}
-                                <div style={{ marginBottom: "1rem" }}>
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            flexWrap: "wrap",
-                                            gap: "0.5rem",
-                                        }}
-                                    >
-                                        {job.skills.slice(0, 6).map((skill, index) => (
-                                            <span
-                                                key={index}
+                                            <div
                                                 style={{
-                                                    padding: "0.25rem 0.75rem",
-                                                    backgroundColor: "#f0f9ff",
-                                                    color: "#0369a1",
-                                                    borderRadius: "12px",
-                                                    fontSize: "0.8rem",
-                                                    fontWeight: "500",
-                                                    border: "1px solid #e0f2fe",
-                                                }}
-                                            >
-                                                {skill}
-                                            </span>
-                                        ))}
-                                        {job.skills.length > 6 && (
-                                            <span
-                                                style={{
-                                                    padding: "0.25rem 0.75rem",
-                                                    backgroundColor: "#f3f4f6",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.25rem",
+                                                    fontSize: "0.9rem",
                                                     color: "#6b7280",
-                                                    borderRadius: "12px",
-                                                    fontSize: "0.8rem",
-                                                    fontWeight: "500",
                                                 }}
                                             >
-                                                +{job.skills.length - 6} more
-                                            </span>
-                                        )}
+                                                <Users size={14} />
+                                                {job.applicants} applicants
+                                            </div>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.25rem",
+                                                    fontSize: "0.9rem",
+                                                    color: "#6b7280",
+                                                }}
+                                            >
+                                                <Calendar size={14} />
+                                                Posted {job.postedDate}
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "0.75rem",
+                                            }}
+                                        >
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    toggleBookmark(job.id)
+                                                }}
+                                                style={{
+                                                    backgroundColor: "transparent",
+                                                    border: "none",
+                                                    padding: "0.5rem",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    transition: "background-color 0.2s ease",
+                                                }}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                            >
+                                                <Bookmark
+                                                    size={18}
+                                                    color={bookmarkedJobs.includes(job.id) ? "#3b82f6" : "#6b7280"}
+                                                    fill={bookmarkedJobs.includes(job.id) ? "#3b82f6" : "none"}
+                                                />
+                                            </button>
+
+                                            <button
+                                                onClick={(e) => e.stopPropagation()}
+                                                style={{
+                                                    backgroundColor: "transparent",
+                                                    border: "none",
+                                                    padding: "0.5rem",
+                                                    borderRadius: "6px",
+                                                    cursor: "pointer",
+                                                    transition: "background-color 0.2s ease",
+                                                }}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+                                            >
+                                                <Share2 size={18} color="#6b7280" />
+                                            </button>
+
+                                            <button
+                                                onClick={(e) => e.stopPropagation()}
+                                                style={{
+                                                    backgroundColor: "#3b82f6",
+                                                    color: "white",
+                                                    border: "none",
+                                                    padding: "0.75rem 1.5rem",
+                                                    borderRadius: "8px",
+                                                    fontSize: "0.9rem",
+                                                    fontWeight: "600",
+                                                    cursor: "pointer",
+                                                    transition: "all 0.2s ease",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: "0.5rem",
+                                                }}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = "#2563eb")}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = "#3b82f6")}
+                                            >
+                                                Apply Now
+                                                <ChevronRight size={16} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-
-                                {/* Job Footer */}
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        paddingTop: "1rem",
-                                        borderTop: "1px solid #f3f4f6",
-                                        flexDirection: isMobile ? "column" : "row",
-                                        gap: isMobile ? "1rem" : "0",
-                                    }}
-                                >
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "1.5rem",
-                                            flexWrap: "wrap",
-                                        }}
-                                    >
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "0.25rem",
-                                                fontSize: "1rem",
-                                                fontWeight: "600",
-                                                color: "#059669",
-                                            }}
-                                        >
-                                            <DollarSign size={16} />
-                                            {job.salary}
-                                        </div>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "0.25rem",
-                                                fontSize: "0.9rem",
-                                                color: "#6b7280",
-                                            }}
-                                        >
-                                            <Users size={14} />
-                                            {job.applicants} applicants
-                                        </div>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "0.25rem",
-                                                fontSize: "0.9rem",
-                                                color: "#6b7280",
-                                            }}
-                                        >
-                                            <Calendar size={14} />
-                                            Posted {job.postedDate}
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "0.75rem",
-                                        }}
-                                    >
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                toggleBookmark(job.id)
-                                            }}
-                                            style={{
-                                                backgroundColor: "transparent",
-                                                border: "none",
-                                                padding: "0.5rem",
-                                                borderRadius: "6px",
-                                                cursor: "pointer",
-                                                transition: "background-color 0.2s ease",
-                                            }}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
-                                        >
-                                            <Bookmark
-                                                size={18}
-                                                color={bookmarkedJobs.includes(job.id) ? "#3b82f6" : "#6b7280"}
-                                                fill={bookmarkedJobs.includes(job.id) ? "#3b82f6" : "none"}
-                                            />
-                                        </button>
-
-                                        <button
-                                            onClick={(e) => e.stopPropagation()}
-                                            style={{
-                                                backgroundColor: "transparent",
-                                                border: "none",
-                                                padding: "0.5rem",
-                                                borderRadius: "6px",
-                                                cursor: "pointer",
-                                                transition: "background-color 0.2s ease",
-                                            }}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#f3f4f6")}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
-                                        >
-                                            <Share2 size={18} color="#6b7280" />
-                                        </button>
-
-                                        <button
-                                            onClick={(e) => e.stopPropagation()}
-                                            style={{
-                                                backgroundColor: "#3b82f6",
-                                                color: "white",
-                                                border: "none",
-                                                padding: "0.75rem 1.5rem",
-                                                borderRadius: "8px",
-                                                fontSize: "0.9rem",
-                                                fontWeight: "600",
-                                                cursor: "pointer",
-                                                transition: "all 0.2s ease",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: "0.5rem",
-                                            }}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = "#2563eb")}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = "#3b82f6")}
-                                        >
-                                            Apply Now
-                                            <ChevronRight size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
 
                     {/* Pagination */}
@@ -1477,10 +1356,10 @@ export default function AllJobs() {
                             >
                                 <X size={24} color="#6b7280" />
                             </button>
-
                             <div style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
                                 <img
-                                    src={selectedJob.companyLogo || "/placeholder.svg"}
+                                    // Use the backend-provided companyLogo, which is either a data URL or '/static/placeholder-logo.png'
+                                    src={selectedJob.companyLogo}
                                     alt={selectedJob.company}
                                     style={{
                                         width: "80px",
@@ -1551,7 +1430,7 @@ export default function AllJobs() {
                                         </div>
                                         <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
                                             <DollarSign size={16} />
-                                            {selectedJob.salary}
+                                            {selectedJob.salary.replace('$', '₹')}
                                         </div>
                                     </div>
                                 </div>
@@ -1737,34 +1616,55 @@ export default function AllJobs() {
                                 >
                                     Requirements
                                 </h3>
-                                <ul
-                                    style={{
-                                        listStyle: "none",
-                                        padding: 0,
-                                        margin: 0,
-                                    }}
-                                >
-                                    {selectedJob.requirements.map((requirement, index) => (
-                                        <li
-                                            key={index}
-                                            style={{
-                                                display: "flex",
-                                                alignItems: "flex-start",
-                                                gap: "0.5rem",
-                                                marginBottom: "0.75rem",
-                                                fontSize: "1rem",
-                                                color: "#4b5563",
-                                                lineHeight: "1.6",
-                                            }}
-                                        >
-                                            <CheckCircle size={16} color="#10b981" style={{ marginTop: "0.125rem", flexShrink: 0 }} />
-                                            {requirement}
-                                        </li>
-                                    ))}
-                                </ul>
+                                {Array.isArray(selectedJob.requirements) && selectedJob.requirements.length > 0 ? (
+                                    <ul
+                                        style={{
+                                            listStyle: "none",
+                                            padding: 0,
+                                            margin: 0,
+                                        }}
+                                    >
+                                        {selectedJob.requirements.map((requirement, index) => (
+                                            <li
+                                                key={index}
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "flex-start",
+                                                    gap: "0.5rem",
+                                                    marginBottom: "0.75rem",
+                                                    fontSize: "1rem",
+                                                    color: "#4b5563",
+                                                    lineHeight: "1.6",
+                                                }}
+                                            >
+                                                <CheckCircle size={16} color="#10b981" style={{ marginTop: "0.125rem", flexShrink: 0 }} />
+                                                {requirement}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p style={{ fontSize: "1rem", color: "#4b5563", lineHeight: "1.7" }}>
+                                        {(() => {
+                                            const title = selectedJob.title ? selectedJob.title.toLowerCase() : "";
+                                            if (title.includes("frontend")) {
+                                                return "To excel as a Frontend Developer, you should have experience with modern JavaScript frameworks, responsive design, and cross-browser compatibility.";
+                                            } else if (title.includes("backend")) {
+                                                return "A Backend Developer should be skilled in server-side languages, database management, and API development.";
+                                            } else if (title.includes("designer")) {
+                                                return "A Designer should have a strong portfolio, proficiency in design tools, and a keen eye for detail.";
+                                            } else if (title.includes("marketing")) {
+                                                return "A Marketing Specialist should have experience in digital campaigns, analytics, and content creation.";
+                                            } else if (title.includes("analyst")) {
+                                                return "An Analyst should be comfortable with data analysis, reporting tools, and critical thinking.";
+                                            } else {
+                                                return `To succeed in this role, you should have relevant experience and skills as a ${selectedJob.title || "professional"}.`;
+                                            }
+                                        })()}
+                                    </p>
+                                )}
                             </div>
 
-                            {/* Skills */}
+                            {/* Required Key Skills */}
                             <div style={{ marginBottom: "2rem" }}>
                                 <h3
                                     style={{
@@ -1774,7 +1674,7 @@ export default function AllJobs() {
                                         marginBottom: "1rem",
                                     }}
                                 >
-                                    Required Skills
+                                    Required Key Skills
                                 </h3>
                                 <div
                                     style={{
@@ -1783,22 +1683,26 @@ export default function AllJobs() {
                                         gap: "0.5rem",
                                     }}
                                 >
-                                    {selectedJob.skills.map((skill, index) => (
-                                        <span
-                                            key={index}
-                                            style={{
-                                                padding: "0.5rem 1rem",
-                                                backgroundColor: "#eff6ff",
-                                                color: "#2563eb",
-                                                borderRadius: "12px",
-                                                fontSize: "0.9rem",
-                                                fontWeight: "500",
-                                                border: "1px solid #dbeafe",
-                                            }}
-                                        >
-                                            {skill}
-                                        </span>
-                                    ))}
+                                    {Array.isArray(selectedJob.skills) && selectedJob.skills.length > 0 ? (
+                                        selectedJob.skills.map((skill, index) => (
+                                            <span
+                                                key={index}
+                                                style={{
+                                                    padding: "0.5rem 1rem",
+                                                    backgroundColor: "#eff6ff",
+                                                    color: "#2563eb",
+                                                    borderRadius: "12px",
+                                                    fontSize: "0.9rem",
+                                                    fontWeight: "500",
+                                                    border: "1px solid #dbeafe",
+                                                }}
+                                            >
+                                                {skill}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span style={{ color: "#6b7280" }}>No key skills specified.</span>
+                                    )}
                                 </div>
                             </div>
 
@@ -1821,7 +1725,7 @@ export default function AllJobs() {
                                         gap: "0.75rem",
                                     }}
                                 >
-                                    {selectedJob.benefits.map((benefit, index) => (
+                                    {Array.isArray(selectedJob.benefits) && selectedJob.benefits.map((benefit, index) => (
                                         <div
                                             key={index}
                                             style={{
@@ -1956,7 +1860,6 @@ export default function AllJobs() {
                     </div>
                 </div>
             )}
-
             {/* Footer */}
             <footer
                 style={{
@@ -2002,7 +1905,6 @@ export default function AllJobs() {
                                 India's leading job portal connecting talented professionals with top companies across all industries.
                             </p>
                         </div>
-
                         <div>
                             <h4
                                 style={{
@@ -2050,7 +1952,6 @@ export default function AllJobs() {
                                 )}
                             </ul>
                         </div>
-
                         <div>
                             <h4
                                 style={{
@@ -2098,7 +1999,6 @@ export default function AllJobs() {
                                 )}
                             </ul>
                         </div>
-
                         <div>
                             <h4
                                 style={{

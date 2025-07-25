@@ -9,7 +9,8 @@ import {
 
 import Homepage from "./components/Homepage/Homepage";
 import CandidateProfileSetup from "./components/ProfileSetups/CandidateProfileSetup"
-import Auth from "./components/Loginandsignup/Login";
+import Login from "./components/Loginandsignup/Login"
+import Signup from "./components/Loginandsignup/Signup"
 import CandidateProfile from "./components/candidate/candidate-profile";
 import CompanyProfile from "./components/company-profile";
 import EmployerProfileSetup2 from "./components/company-profile-setup-2";
@@ -25,6 +26,8 @@ import UploadCandidates from "./components/upload-candidates";
 import JobPostings from "./components/Jobs/JobListings";
 import CandidateManagement from "./components/candidate/candidate-management";
 import AllJobs from "./components/AllJobs"
+import ForgotPassword from "./components/Loginandsignup/ForgotPassword";
+import JobSearch from "./components/Jobs/jobsearch";
 
 // 🔹 Floating Route Dialog Component
 const RouteDialog = () => {
@@ -33,8 +36,8 @@ const RouteDialog = () => {
 
   const routes = [
     { path: "/", label: "Homepage" },
-    { path: "/signin", label: "Candidate Signup" },
-    { path: "/signin", label: "Candidate Signin" },
+    { path: "/signup", label: "Candidate Signup" },
+    { path: "/login", label: "Candidate Login" },
     { path: "/candidate/profile", label: "Candidate Profile" },
     { path: "/profile-setup", label: "Profile Setup" },
     { path: "/company-profile", label: "Company Profile" },
@@ -51,6 +54,7 @@ const RouteDialog = () => {
     { path: "/jobs-hub", label: "Job Hub" },
     { path: "/candidate-management", label: "Candidate Management" },
     { path: "/all-jobs", label: "All Jobs" },
+    { path: "/job-search", label: "Job Search" },
   ];
 
   if (!visible) {
@@ -131,7 +135,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/jobs" element={<JobPostingForm />} />
-          <Route path="/signin" element={<Auth />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/candidate/profile" element={<CandidateProfile />} />
           <Route path="/profile-setup" element={<CandidateProfileSetup />} />
           <Route path="/personal-details" element={<Navigate to="/profile-setup" replace />} />
@@ -154,6 +159,8 @@ function App() {
           <Route path="/jobs-hub" element={<JobPostings />} />
           <Route path="/candidate-management" element={<CandidateManagement />} />
           <Route path="/all-jobs" element={<AllJobs />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/job-search" element={<JobSearch />} />
         </Routes>
       </div>
     </Router>

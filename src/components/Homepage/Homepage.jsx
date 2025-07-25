@@ -3,13 +3,12 @@
 import { useState, useEffect } from "react"
 import { Menu, X, Search, MapPin, Briefcase, Star, ChevronRight, Clock, Heart, Share2, TrendingUp, Users, Award, Shield, Building2, CheckCircle, Target, Globe, Bell, Filter, SortDesc, Bookmark, Eye, Download, Calendar, MapPinIcon, DollarSign, Zap, Lightbulb, Rocket, BarChart3, ArrowRight, Play, ChevronUp, ChevronDown } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { css } from "@emotion/react"
 
 export default function JobPortalHomepage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [location, setLocation] = useState("")
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [activeCategory, setActiveCategory] = useState(null)
-    const [scrolled, setScrolled] = useState(false)
 
     const navigate = useNavigate();
 
@@ -21,26 +20,16 @@ export default function JobPortalHomepage() {
             }
         }
 
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 20)
-        }
-
         handleResize()
         window.addEventListener("resize", handleResize)
-        window.addEventListener("scroll", handleScroll)
         return () => {
             window.removeEventListener("resize", handleResize)
-            window.removeEventListener("scroll", handleScroll)
         }
     }, [])
 
     const handleLogin = () => {
         navigate('/signup');
     }
-
-    const isDesktop = () => window.innerWidth >= 1024
-    const isTablet = () => window.innerWidth >= 768 && window.innerWidth < 1024
-    const isMobile = () => window.innerWidth < 768
 
     const jobCategories = [
         { name: "Software Development", count: "25,847", icon: "💻", bgColor: "#eff6ff", iconColor: "#2563eb" },
@@ -306,7 +295,7 @@ export default function JobPortalHomepage() {
                                 gap: "2rem",
                             }}
                         >
-                            {["Home", "Find Jobs", "Companies", "Talent", "Mentorship Program"].map((item) => (
+                            {["Home", "Find Jobs", "Companies", "Talent", "Partner Bench", "Mentorship Program"].map((item) => (
                                 <a
                                     key={item}
                                     href="#"
@@ -343,6 +332,7 @@ export default function JobPortalHomepage() {
                             }}
                         >
                             <span
+                                onClick={() => navigate("/employer-signup")}
                                 style={{
                                     fontSize: "0.9rem",
                                     color: "#6b7280",
@@ -429,7 +419,7 @@ export default function JobPortalHomepage() {
                                 gap: "0.5rem",
                             }}
                         >
-                            {["Home", "Find Jobs", "Companies", "Talent", "Mentorship Program"].map((item) => (
+                            {["Home", "Find Jobs", "Companies", "Talent", "Partner Bench", "Mentorship Program"].map((item) => (
                                 <a
                                     key={item}
                                     href="#"
@@ -686,6 +676,7 @@ export default function JobPortalHomepage() {
                                     e.target.style.transform = "translateY(0)"
                                     e.target.style.boxShadow = "0 4px 6px rgba(99, 102, 241, 0.25)"
                                 }}
+                                onClick={() => navigate('/job-search', { state: { searchTerm, location } })}
                             >
                                 <Search size={18} />
                                 Find Jobs
@@ -1148,7 +1139,7 @@ export default function JobPortalHomepage() {
                             gap: "1.5rem",
                         }}
                     >
-                        {featuredJobs.map((job, index) => (
+                        {featuredJobs.map((job) => (
                             <div
                                 key={job.id}
                                 style={{
@@ -1688,7 +1679,6 @@ export default function JobPortalHomepage() {
                     </div>
                 </div>
             </section>
-
             {/* Career Insights */}
             <section
                 style={{
