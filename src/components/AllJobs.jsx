@@ -1048,46 +1048,48 @@ export default function AllJobs() {
                                     </p>
 
                                     {/* Skills */}
-                                    <div style={{ marginBottom: "1rem" }}>
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexWrap: "wrap",
-                                                gap: "0.5rem",
-                                            }}
-                                        >
-                                            {Array.isArray(job.skills) ? job.skills.slice(0, 6).map((skill, index) => (
-                                                <span
-                                                    key={index}
-                                                    style={{
-                                                        padding: "0.25rem 0.75rem",
-                                                        backgroundColor: "#f0f9ff",
-                                                        color: "#0369a1",
-                                                        borderRadius: "12px",
-                                                        fontSize: "0.8rem",
-                                                        fontWeight: "500",
-                                                        border: "1px solid #e0f2fe",
-                                                    }}
-                                                >
-                                                    {skill}
-                                                </span>
-                                            )) : null}
-                                            {Array.isArray(job.skills) && job.skills.length > 6 && (
-                                                <span
-                                                    style={{
-                                                        padding: "0.25rem 0.75rem",
-                                                        backgroundColor: "#f3f4f6",
-                                                        color: "#6b7280",
-                                                        borderRadius: "12px",
-                                                        fontSize: "0.8rem",
-                                                        fontWeight: "500",
-                                                    }}
-                                                >
-                                                    +{job.skills.length - 6} more
-                                                </span>
-                                            )}
+                                    {Array.isArray(job.skills) && job.skills.length > 0 && (
+                                        <div style={{ marginBottom: "1rem" }}>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    flexWrap: "wrap",
+                                                    gap: "0.5rem",
+                                                }}
+                                            >
+                                                {job.skills.slice(0, 6).map((skill, index) => (
+                                                    <span
+                                                        key={index}
+                                                        style={{
+                                                            padding: "0.25rem 0.75rem",
+                                                            backgroundColor: "#f0f9ff",
+                                                            color: "#0369a1",
+                                                            borderRadius: "12px",
+                                                            fontSize: "0.8rem",
+                                                            fontWeight: "500",
+                                                            border: "1px solid #e0f2fe",
+                                                        }}
+                                                    >
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                                {job.skills.length > 6 && (
+                                                    <span
+                                                        style={{
+                                                            padding: "0.25rem 0.75rem",
+                                                            backgroundColor: "#f3f4f6",
+                                                            color: "#6b7280",
+                                                            borderRadius: "12px",
+                                                            fontSize: "0.8rem",
+                                                            fontWeight: "500",
+                                                        }}
+                                                    >
+                                                        +{job.skills.length - 6} more
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     {/* Job Footer */}
                                     <div
